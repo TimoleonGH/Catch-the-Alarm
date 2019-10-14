@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    app:cardPreventCornerOverlap="false"
+    app:cardElevation="2dp"
+    app:cardCornerRadius="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card_view_backgroundCL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/daysTV"
+
+            android:text="Sun, Mon, Tue, Wed, Thu, Fri, Sat"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/colorWhite"
+            android:padding="10dp"
+
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/day_night_switchLAV"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/timeTV"
+
+            android:text="16:00"
+            android:textSize="38sp"
+            android:textColor="@color/colorWhite"
+            android:gravity="center"
+            android:padding="10dp"
+            android:layout_marginBottom="10dp"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/day_night_switchLAV"
+            app:layout_constraintTop_toBottomOf="@+id/daysTV" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="160dp"
+            android:layout_height="0dp"
+            android:id="@+id/day_night_switchLAV"
+
+            android:elevation="2dp"
+            android:scaleType="centerCrop"
+            android:padding="6dp"
+
+            app:lottie_speed="-2.5"
+            app:lottie_loop="false"
+            app:lottie_autoPlay="false"
+            app:lottie_fileName="day_night_switch.json"
+
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

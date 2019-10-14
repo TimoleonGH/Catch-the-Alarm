@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/simple_item_root_CL"
+    android:theme="@style/AppTheme"
+    android:layout_marginStart="0dp"
+    android:layout_marginEnd="0dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:id="@+id/simple_item_time_TV"
+
+        android:text="04:00"
+        android:textColor="@color/colorDark"
+        android:textSize="26sp"
+        android:padding="0dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/simple_item_repeat_TV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/simple_item_message_IV"
+
+        android:src="@drawable/ic_text"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/simple_item_repeat_TV"
+        app:layout_constraintStart_toEndOf="@+id/simple_item_time_TV"
+        app:layout_constraintEnd_toStartOf="@+id/simple_item_snooze_IV"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/simple_item_snooze_IV"
+
+        android:src="@drawable/ic_snooze"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/simple_item_repeat_TV"
+        app:layout_constraintStart_toEndOf="@+id/simple_item_message_IV"
+        app:layout_constraintEnd_toStartOf="@+id/simple_item_vibrate_IV"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/simple_item_vibrate_IV"
+
+        android:src="@drawable/ic_vibration"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/simple_item_repeat_TV"
+        app:layout_constraintStart_toEndOf="@+id/simple_item_snooze_IV"
+        app:layout_constraintEnd_toStartOf="@+id/simple_item_game_IV"/>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:id="@+id/simple_item_game_IV"
+
+        android:src="@drawable/ic_videogame"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/simple_item_repeat_TV"
+        app:layout_constraintStart_toEndOf="@+id/simple_item_vibrate_IV"
+        app:layout_constraintEnd_toStartOf="@+id/simple_item_on_S"/>
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:id="@+id/simple_item_on_S"
+
+        android:layout_margin="10dp"
+
+        android:checked="true"
+        android:theme="@style/SwitchTheme"
+
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/simple_item_repeat_TV"
+
+        android:text="@string/app_name"
+        android:textColor="@color/colorDark"
+        android:textSize="16sp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="4dp"
+
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/simple_item_on_S"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
