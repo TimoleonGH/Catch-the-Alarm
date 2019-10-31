@@ -1,4 +1,4 @@
-package com.lamti.alarmy.ui
+package com.lamti.alarmy.ui.main_activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -21,9 +21,8 @@ import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
 import com.lamti.alarmy.utils.changeIconColor
 import com.lamti.alarmy.utils.changeTextColor
-import kotlinx.android.synthetic.main.activity_new_alarm.*
 
-class SimpleAlarmAdapter(private var interaction: Interaction? = null, private val context: Context) :
+class AlarmAdapter(private var interaction: Interaction? = null, private val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -59,7 +58,10 @@ class SimpleAlarmAdapter(private var interaction: Interaction? = null, private v
             TYPE_ITEM -> {
                 val view = LayoutInflater.from(context)
                     .inflate(R.layout.list_item_simple_alarm, parent, false)
-                SimpleAlarmViewHolder(view, interaction)
+                SimpleAlarmViewHolder(
+                    view,
+                    interaction
+                )
             }
             else -> throw IllegalArgumentException("Invalid view type")
         }
@@ -137,7 +139,7 @@ class SimpleAlarmAdapter(private var interaction: Interaction? = null, private v
     class HeaderViewHolder(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
         @SuppressLint("SetTextI18n")
         fun bind() = with(itemView) {
-            itemView.header_content_TV.text = "The good guy knows another road..."
+            itemView.header_content_TV.text = "Wake App or just wake nap..."
             setDate(itemView.header_title_TV)
 
             itemView.header_settings_IB.setOnClickListener {
@@ -154,13 +156,13 @@ class SimpleAlarmAdapter(private var interaction: Interaction? = null, private v
         }
 
         private fun setDate(textView: TextView) {
-            val text = "CatchTheAlarm · ${getCurrentDate()}"
-            val substring = "CatchTheAlarm"
+            val text = "Wake App · ${getCurrentDate()}"
+            val substring = "Wake App"
             val spannable = SpannableString(text)
             val start = text.indexOf(substring)
             val end = start + substring.length
             spannable.setSpan(
-                ForegroundColorSpan(Color.parseColor("#0E7BF0")),
+                ForegroundColorSpan(Color.parseColor("#F8F9FB")), // white
                 start,
                 end,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

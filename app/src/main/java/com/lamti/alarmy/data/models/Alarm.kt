@@ -8,13 +8,17 @@ import androidx.room.PrimaryKey
 data class Alarm(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "alarm_id")
-    val id: Int = 0,
+    var id: Int = 0,
     @ColumnInfo(name = "alarm_time")
     var time: String,
+    @ColumnInfo(name = "alarm_mili_time")
+    var miliTime: Long,
     @ColumnInfo(name = "alarm_message")
     var message: String,
     @ColumnInfo(name = "alarm_days")
     var days: List<String>?,
+    @ColumnInfo(name = "alarm_int_days")
+    var intDays: List<Int>?,
     @ColumnInfo(name = "alarm_game")
     var game: Boolean,
     @ColumnInfo(name = "alarm_snooze")

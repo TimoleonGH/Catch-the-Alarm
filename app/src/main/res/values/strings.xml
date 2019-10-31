@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CatchTheAlarm</string>
+    <string name="app_name">Wake App</string>
     <string name="sundayMin">S</string>
     <string name="mondayMin">M</string>
     <string name="tuesdayMin">T</string>
@@ -7,7 +7,6 @@
     <string name="thursdayMin">T</string>
     <string name="fridayMin">F</string>
     <string name="saturdayMin">S</string>
-    <string name="add">add</string>
     <string name="cancel">cancel</string>
     <string name="new_alarm">new alarm</string>
     <string name="message">message</string>
@@ -15,4 +14,26 @@
     <string name="vibrate">vibrate</string>
     <string name="snooze">snooze</string>
     <string name="repeat">Repeat:</string>
+
+    <string name="title_activity_alarmy">AlarmyActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="update">update</string>
+    <string name="add">add</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

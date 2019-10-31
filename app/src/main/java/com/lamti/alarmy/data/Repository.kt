@@ -1,19 +1,24 @@
 package com.lamti.alarmy.data
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import com.lamti.alarmy.data.local.AlarmsDao
 import com.lamti.alarmy.data.models.Alarm
 
-class Repository ( private val alarmsDao: AlarmsDao) {
+class Repository (private val alarmsDao: AlarmsDao, private val context: Context) {
 
     val allAlarms: LiveData<List<Alarm>> = alarmsDao.alarms()
 
-    suspend fun insert(alarm: Alarm) {
-        alarmsDao.insertAlarm(alarm)
+    suspend fun insert(alarm: Alarm): Long {
+        return alarmsDao.insertAlarm(alarm)
     }
 
     suspend fun update(alarm: Alarm) {
         alarmsDao.updateAlarm(alarm)
+    }
+
+    suspend fun delete(alarm: Alarm) {
+        alarmsDao.deleteAlarm(alarm)
     }
 
     suspend fun deleteAll() {

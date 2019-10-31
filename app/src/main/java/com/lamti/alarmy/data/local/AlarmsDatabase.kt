@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.lamti.alarmy.data.models.Alarm
 
 @Database(entities = [Alarm::class], version = 1, exportSchema = false)
-@TypeConverters(value = [(StringListConverter::class)])
+@TypeConverters(value = [(StringListConverter::class), (IntListConverter::class)])
 abstract class AlarmsDatabase: RoomDatabase() {
 
     abstract fun alarmsDao(): AlarmsDao

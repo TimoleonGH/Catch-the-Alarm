@@ -4,40 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:theme="@style/AppTheme"
-    android:layout_height="220dp">
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/header_title_TV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-
-        android:layout_margin="20dp"
-        android:fontFamily="casual"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textColor="@color/colorDark"
-
-        android:textSize="20sp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0" />
-
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:id="@+id/header_settings_IB"
-
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_settings"
-
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintTop_toTopOf="@+id/header_title_TV"
-        app:layout_constraintBottom_toBottomOf="@+id/header_title_TV"
-        app:layout_constraintStart_toEndOf="@+id/header_title_TV"
-        app:layout_constraintEnd_toEndOf="parent"/>
+    android:layout_height="200dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
@@ -48,15 +15,15 @@
         app:cardElevation="2dp"
         app:cardCornerRadius="20dp"
 
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header_title_TV" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/header_card_view_backgroundCL"
@@ -65,20 +32,57 @@
             android:background="@color/colorPrimary">
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="0dp"
+                android:id="@+id/header_title_TV"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:layout_margin="20dp"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:text="@string/app_name"
+                android:textColor="@color/colorDark"
+
+                android:textSize="20sp"
+
+                app:layout_constraintBottom_toBottomOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintEnd_toStartOf="@+id/header_settings_IB"
+                app:layout_constraintStart_toStartOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintTop_toTopOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintVertical_bias="0" />
+
+            <androidx.appcompat.widget.AppCompatImageButton
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/header_settings_IB"
+
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_settings"
+                android:tint="@color/colorWhite"
+
+                app:layout_constraintHorizontal_bias="0.95"
+                app:layout_constraintVertical_bias="0.1"
+                app:layout_constraintTop_toTopOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintBottom_toBottomOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintStart_toStartOf="@+id/header_card_view_backgroundCL"
+                app:layout_constraintEnd_toEndOf="@+id/header_card_view_backgroundCL"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:id="@+id/header_content_TV"
+                android:background="@drawable/background_white_small_rounded"
 
                 android:fontFamily="@font/allan"
                 android:gravity="center"
                 android:textSize="18sp"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorDark"
                 android:padding="10dp"
+                android:layout_margin="20dp"
 
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/header_title_TV"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

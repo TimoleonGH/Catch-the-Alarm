@@ -22,4 +22,6 @@
 
     <color name="colorYellow">#F5CE2A</color>
     <color name="colorYellowDark">#FABF45</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

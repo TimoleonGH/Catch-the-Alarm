@@ -5,17 +5,14 @@ import androidx.annotation.NonNull
 import androidx.room.Room
 import com.lamti.alarmy.data.local.AlarmsDao
 import com.lamti.alarmy.data.local.AlarmsDatabase
-import com.lamti.alarmy.ui.AlarmsAdapter
-import com.lamti.alarmy.ui.SimpleAlarmAdapter
-import org.koin.android.ext.koin.androidContext
+import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.ui.main_activity.AlarmAdapter
 import org.koin.dsl.module
 
 val repositoryModule = module {
     single { provideDatabase(get()) }
     single { provideMovieDao(get()) }
-    single { (interaction:AlarmsAdapter.Interaction) -> AlarmsAdapter( interaction, get() ) }
-    single { (interaction:SimpleAlarmAdapter.Interaction) -> SimpleAlarmAdapter( interaction, get() ) }
-
+    single { (interaction: AlarmAdapter.Interaction) -> AlarmAdapter( interaction, get() ) }
 }
 
 

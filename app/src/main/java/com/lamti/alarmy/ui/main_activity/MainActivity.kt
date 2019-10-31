@@ -1,4 +1,4 @@
-package com.lamti.alarmy.ui
+package com.lamti.alarmy.ui.main_activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,13 +19,17 @@ import android.os.Handler
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.lamti.alarmy.R
+import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.ui.NewAlarmActivity
+import com.lamti.alarmy.ui.SettingsActivity
 import com.lamti.alarmy.utils.fadeOut
 
 
-class MainActivity : AppCompatActivity(), SimpleAlarmAdapter.Interaction {
+class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
     private val mainVieModel: MainVieModel by viewModel()
-    private val alarmsAdapter : SimpleAlarmAdapter by inject { parametersOf(this, this@MainActivity) }
+    private val alarmsAdapter : AlarmAdapter by inject { parametersOf(this, this@MainActivity) }
+    private val alarmyManager = AlarmyManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +61,7 @@ class MainActivity : AppCompatActivity(), SimpleAlarmAdapter.Interaction {
     private fun initObserver() {
         mainVieModel.allAlarms.observe(this, Observer {result ->
             if ( result.isEmpty() ) {
-                val headerAlarm = Alarm(0, "nullara", "nullara", null, game = false,
+                val headerAlarm = Alarm(0, "nullara", 0L,"nullara",null, null, game = false,
                     vibration = false, snooze = false, isOn = false)
                 mainVieModel.insert(headerAlarm)
             }
@@ -123,10 +127,17 @@ class MainActivity : AppCompatActivity(), SimpleAlarmAdapter.Interaction {
         item.isOn = !item.isOn
         mainVieModel.updateAlarm(item).invokeOnCompletion {
             alarmsAdapter.notifyItemChanged(position)
+            alarmyManager.updateAlarm(item, applicationContext)
         }
     }
 
     override fun onSettingsClicked() {
-        mainVieModel.deleteAll()
+//        mainVieModel.deleteAll()
+        redirectTo(SettingsActivity::class.java)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainVieModel
     }
 }

@@ -1,7 +1,10 @@
 package com.lamti.alarmy
 
 import android.app.Application
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import com.lamti.alarmy.di.appModules
+import com.lamti.alarmy.receivers.RebootReceiver
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -14,5 +17,16 @@ class Alarmy : Application() {
             androidContext(this@Alarmy)
             modules(appModules)
         }
+
+        enableAlarm()
+    }
+
+    private fun enableAlarm() {
+        val receiver = ComponentName(applicationContext, RebootReceiver::class.java)
+        applicationContext.packageManager?.setComponentEnabledSetting(
+            receiver,
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, // PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            PackageManager.DONT_KILL_APP
+        )
     }
 }

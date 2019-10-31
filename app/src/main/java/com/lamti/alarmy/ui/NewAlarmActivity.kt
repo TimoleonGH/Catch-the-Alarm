@@ -4,17 +4,20 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.lamti.alarmy.R
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.lamti.alarmy.data.models.Alarm
+import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.ui.main_activity.MainVieModel
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.utils.changeIconColor
-import com.lamti.alarmy.utils.showSnackBar
 import kotlinx.android.synthetic.main.activity_new_alarm.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.DecimalFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class NewAlarmActivity : AppCompatActivity() {
 
@@ -22,6 +25,7 @@ class NewAlarmActivity : AppCompatActivity() {
     private var updateAlarm = false
     private val decimalFormat = DecimalFormat("00")
     private val mainVieModel: MainVieModel by viewModel()
+    private val alarmyManager = AlarmyManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +47,18 @@ class NewAlarmActivity : AppCompatActivity() {
             Gson().fromJson(stringLocation, type)
         } else {
             updateAlarm = false
-            Alarm(0, "09:00", "", null, game = true, snooze = true, vibration = true, isOn = true)
+            Alarm(
+                0,
+                "09:00",
+                0L,
+                "",
+                null,
+                null,
+                game = true,
+                snooze = true,
+                vibration = true,
+                isOn = true
+            )
         }
     }
 
@@ -60,22 +75,27 @@ class NewAlarmActivity : AppCompatActivity() {
             } else {
                 new_alarm_time_picker_TP.hour = currentHour
                 new_alarm_time_picker_TP.minute = currentMinute
-                alarm.time = "${decimalFormat.format(currentHour)}:${decimalFormat.format(currentMinute)}"
+                alarm.time =
+                    "${decimalFormat.format(currentHour)}:${decimalFormat.format(currentMinute)}"
             }
         }
 
         new_alarm_time_picker_TP.setOnTimeChangedListener { view, hourOfDay, minute ->
+
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+            cal.set(Calendar.MINUTE, minute)
+            cal.set(Calendar.MILLISECOND, 0)
+
+            alarm.miliTime = cal.timeInMillis
             alarm.time = "${decimalFormat.format(hourOfDay)}:${decimalFormat.format(minute)}"
         }
     }
 
     private fun initDaysPicker() {
         if (updateAlarm) {
-            if (!alarm.days.isNullOrEmpty()) {
+            if (!alarm.days.isNullOrEmpty())
                 new_alarm_day_picker_DPV.setSelectedDaysList(alarm.days!!)
-                Log.d("PAPA","alarm: ${alarm.days}")
-            } else
-                Log.d("PAPA","null or empty")
         }
     }
 
@@ -89,13 +109,22 @@ class NewAlarmActivity : AppCompatActivity() {
         new_alarm_vibrate_IV.changeIconColor(alarm.vibration)
         new_alarm_game_IV.changeIconColor(alarm.game)
 
-        if (updateAlarm)
-            new_alarm_add_B.text = "update"
-        else
-            new_alarm_add_B.text = "add"
+        if (updateAlarm) {
+            new_alarm_add_B.text = getString(R.string.update)
+            new_alarm_delete_IV.visibility = View.VISIBLE
+        } else {
+            new_alarm_add_B.text = getString(R.string.add)
+            new_alarm_delete_IV.visibility = View.GONE
+        }
     }
 
     private fun clickListeners() {
+        new_alarm_delete_IV.setOnClickListener {
+            alarmyManager.cancelAlarm(alarm, applicationContext)
+            mainVieModel.deleteAlarm(alarm)
+            finish()
+        }
+
         new_alarm_snooze_IV.setOnClickListener {
             alarm.snooze = !alarm.snooze
             new_alarm_snooze_IV.changeIconColor(alarm.snooze)
@@ -120,29 +149,68 @@ class NewAlarmActivity : AppCompatActivity() {
             addMessageToNewAlarm()
 
             if (updateAlarm) {
+                alarm.isOn = true
                 mainVieModel.updateAlarm(alarm).invokeOnCompletion {
-                    new_alarm_root_CL.showSnackBar("Alarm updated")
+                    alarmyManager.addAlarm(alarm, applicationContext)
+//                    new_alarm_root_CL.showSnackBar("Alarm updated")
                     finish()
                 }
             } else {
                 mainVieModel.insert(alarm).invokeOnCompletion {
-                    new_alarm_root_CL.showSnackBar("Alarm added")
+                    alarm.id = mainVieModel.insertedAlarmID.toInt()
+                    alarmyManager.addAlarm(alarm, applicationContext)
+//                    new_alarm_root_CL.showSnackBar("Alarm added")
                     finish()
                 }
             }
-
         }
     }
 
     private fun addSelectedDaysToNewAlarm() {
-        alarm.days = new_alarm_day_picker_DPV.getSelectedDaysList()
+
+        val selectedDays = new_alarm_day_picker_DPV.getSelectedDaysList()
+        val selectedIntDays = ArrayList<Int>()
+        val selectedStringDays = ArrayList<String>()
+
+        selectedDays.forEach {
+            when (it) {
+                "Sunday" -> selectedIntDays.add(1)
+                "Monday" -> selectedIntDays.add(2)
+                "Tuesday" -> selectedIntDays.add(3)
+                "Wednesday" -> selectedIntDays.add(4)
+                "Thursday" -> selectedIntDays.add(5)
+                "Friday" -> selectedIntDays.add(6)
+                "Saturday" -> selectedIntDays.add(7)
+            }
+        }
+
+        selectedIntDays.sort()
+        alarm.intDays = selectedIntDays
+
+        selectedIntDays.forEach {
+            when (it) {
+                Calendar.SUNDAY -> selectedStringDays.add("Sunday")
+                Calendar.MONDAY -> selectedStringDays.add("Monday")
+                Calendar.TUESDAY -> selectedStringDays.add("Tuesday")
+                Calendar.WEDNESDAY -> selectedStringDays.add("Wednesday")
+                Calendar.THURSDAY -> selectedStringDays.add("Thursday")
+                Calendar.FRIDAY -> selectedStringDays.add("Friday")
+                Calendar.SATURDAY -> selectedStringDays.add("Saturday")
+                else -> ""
+            }
+
+        }
+
+        alarm.days = selectedStringDays
+
+        alarm.intDays?.forEachIndexed { index, i ->
+            Log.d("ANALA", "index: $index, day: $i")
+        }
     }
 
     private fun addMessageToNewAlarm() {
-        alarm.message = if (new_alarm_message_ET.text.isNullOrEmpty()) "" else new_alarm_message_ET.text.toString()
+        alarm.message =
+            if (new_alarm_message_ET.text.isNullOrEmpty()) "" else new_alarm_message_ET.text.toString()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
 }

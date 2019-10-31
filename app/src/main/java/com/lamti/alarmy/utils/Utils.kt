@@ -7,6 +7,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
@@ -21,6 +22,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.lamti.alarmy.R
 import kotlinx.android.synthetic.main.list_item_simple_alarm.view.*
+import java.util.*
 
 const val ALARM_DATA_EXTRA = "ALARM_DATA_EXTRA"
 
@@ -92,4 +94,25 @@ fun View.fadeOut() {
             }
         })
         .start()
+}
+
+fun String.getTimeInMillis(): Long {
+    var alarmHour = 0
+    var alarmMinute = 0
+
+    try {
+        val timeTable = this.split(":")
+        alarmHour = timeTable[0].toInt()
+        alarmMinute = timeTable[1].toInt()
+    } catch (e: Exception) {
+        Log.e("ERROR", "Error: ${e.message}")
+    }
+
+    val alarmCalendar = Calendar.getInstance()
+    alarmCalendar.set(Calendar.HOUR_OF_DAY, alarmHour)
+    alarmCalendar.set(Calendar.MINUTE, alarmMinute)
+    alarmCalendar.set(Calendar.SECOND, 0)
+    alarmCalendar.set(Calendar.MILLISECOND, 0)
+
+    return alarmCalendar.timeInMillis
 }
