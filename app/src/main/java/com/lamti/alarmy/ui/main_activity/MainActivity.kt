@@ -5,15 +5,14 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.utils.SpacingItemDecoration
-import com.lamti.alarmy.utils.redirectTo
-import com.lamti.alarmy.utils.scaleAnimation
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.app.AlarmManager
+import android.content.Context
 import android.view.ViewAnimationUtils
 import android.os.Handler
 import android.view.View.GONE
@@ -22,7 +21,9 @@ import com.lamti.alarmy.R
 import com.lamti.alarmy.receivers.AlarmyManager
 import com.lamti.alarmy.ui.NewAlarmActivity
 import com.lamti.alarmy.ui.SettingsActivity
-import com.lamti.alarmy.utils.fadeOut
+import com.lamti.alarmy.utils.*
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         main_root_CL.visibility = VISIBLE
         main_root_CL.alpha = 1f
     }
+
+
 
     private fun initRecyclerView() {
         alarms_RV.apply {
@@ -94,8 +97,6 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
                 super.onAnimationStart(animation)
                 delayedStartNextActivity()
                 main_root_CL.fadeOut()
-//                reveal_view.fadeOut()
-//                redirectTo(NewAlarmActivity::class.java)
             }
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)

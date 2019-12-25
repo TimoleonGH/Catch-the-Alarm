@@ -3,28 +3,35 @@ package com.lamti.alarmy.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.ui.AlarmyActivity
 import com.lamti.alarmy.ui.main_activity.MainActivity
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import java.util.concurrent.TimeUnit
-import kotlin.math.abs
-
+import java.util.*
 
 class AlarmyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-
         val cAlarm = getAlarm(intent)
-        val maxDuration= TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS)
-        val duration = abs(System.currentTimeMillis() - cAlarm.miliTime)
 
-//        if (duration < maxDuration)
-//            launchMainActivity(context)
-//        else
-        launchAlarmyActivity(context, cAlarm)
+        val aca = Calendar.getInstance()
+        aca.timeInMillis = cAlarm.miliTime
+        val alarmHour = aca.get(Calendar.HOUR)
+        val alarmMinute = aca.get(Calendar.MINUTE)
+
+        val nowCal = Calendar.getInstance()
+        val nowHour = nowCal.get(Calendar.HOUR)
+        val nowMinute = nowCal.get(Calendar.MINUTE)
+
+        Log.d("ALARMARA", "now: $nowHour:$nowMinute, alarm: $alarmHour:$alarmMinute")
+
+        if ( nowHour == alarmHour && nowMinute == alarmMinute )
+            launchAlarmyActivity(context, cAlarm)
+        else
+            launchMainActivity(context)
     }
 
     private fun getAlarm(intent: Intent?): Alarm {

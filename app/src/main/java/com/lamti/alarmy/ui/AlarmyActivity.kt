@@ -26,6 +26,7 @@ import android.animation.PropertyValuesHolder
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.animation.TranslateAnimation
+import kotlin.system.exitProcess
 
 
 class AlarmyActivity : AppCompatActivity() {
@@ -105,7 +106,6 @@ class AlarmyActivity : AppCompatActivity() {
             layout_ripple_pulse.stopRippleAnimation()
             stopVibration()
             stopMediaPlayer()
-            finish()
 
             if (alarm.intDays.isNullOrEmpty()) {
                 alarm.isOn = false
@@ -114,10 +114,9 @@ class AlarmyActivity : AppCompatActivity() {
                 }
             } else {
                 alarmyManager.addAlarm(alarm, this, true)
-                /*Handler().postDelayed ({
-                    alarmyManager.addAlarm(alarm, this, true)
-                }, 60 * 1000)*/
             }
+
+            closeApp()
         }
 
         alarmy_snooze_TV.setOnClickListener {
@@ -125,12 +124,14 @@ class AlarmyActivity : AppCompatActivity() {
         }
     }
 
+    private fun closeApp() {
+        finishAndRemoveTask()
+    }
 
 
     // ~~~~~~~~~~ SOUND ~~~~~~~~~~
     private fun startMediaPlayer(uri: Uri?) {
         mediaPlayer = MediaPlayer()
-//        val uri = Uri.parse("android.resource://com.lamti.youvegotmessage/" + R.raw.send_message_sound)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val audioAttributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)

@@ -1,6 +1,7 @@
 package com.lamti.alarmy.ui.main_activity
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.content.Context
 import android.graphics.Color
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
 import com.lamti.alarmy.utils.changeIconColor
 import com.lamti.alarmy.utils.changeTextColor
+import java.util.concurrent.TimeUnit
 
 class AlarmAdapter(private var interaction: Interaction? = null, private val context: Context) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -145,6 +147,8 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
             itemView.header_settings_IB.setOnClickListener {
                 interaction?.onSettingsClicked()
             }
+
+            itemView.header_content_TV.text = nextAlarmTimeLeft(context)
         }
 
         @SuppressLint("SimpleDateFormat")
@@ -168,6 +172,27 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             textView.setText(spannable, TextView.BufferType.SPANNABLE)
+        }
+
+        private fun nextAlarmTimeLeft(context: Context): String {
+
+            val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val nextAlarmTriggerTime = alarmMgr.nextAlarmClock?.triggerTime ?: 0
+
+            val nextAlarmDate = Date(nextAlarmTriggerTime)
+            val dateNow = Date()
+            val diffMilliSec = nextAlarmDate.time - dateNow.time
+
+            val diffDays = TimeUnit.MILLISECONDS.toDays(diffMilliSec)
+            val diffHours = TimeUnit.MILLISECONDS.toHours(diffMilliSec) % TimeUnit.DAYS.toMinutes(1)
+            val diffMinutes = TimeUnit.MILLISECONDS.toMinutes(diffMilliSec) % TimeUnit.HOURS.toMinutes(1)
+            val diffSeconds = TimeUnit.MILLISECONDS.toSeconds(diffMilliSec) % TimeUnit.MINUTES.toSeconds(1)
+
+            return when {
+                diffDays != 0L -> "next alarm scheduled in $diffDays days, $diffHours hours and $diffMinutes minutes."
+                diffHours != 0L -> "next alarm scheduled in $diffHours hours and $diffMinutes minutes."
+                else -> "next alarm $diffMinutes minutes."
+            }
         }
     }
 
