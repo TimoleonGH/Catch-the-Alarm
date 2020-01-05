@@ -152,14 +152,12 @@ class NewAlarmActivity : AppCompatActivity() {
                 alarm.isOn = true
                 mainVieModel.updateAlarm(alarm).invokeOnCompletion {
                     alarmyManager.addAlarm(alarm, applicationContext)
-//                    new_alarm_root_CL.showSnackBar("Alarm updated")
                     finish()
                 }
             } else {
                 mainVieModel.insert(alarm).invokeOnCompletion {
                     alarm.id = mainVieModel.insertedAlarmID.toInt()
                     alarmyManager.addAlarm(alarm, applicationContext)
-//                    new_alarm_root_CL.showSnackBar("Alarm added")
                     finish()
                 }
             }
