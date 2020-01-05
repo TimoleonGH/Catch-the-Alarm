@@ -22,6 +22,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
 import com.lamti.alarmy.utils.changeIconColor
 import com.lamti.alarmy.utils.changeTextColor
+import org.w3c.dom.Text
 import java.util.concurrent.TimeUnit
 
 class AlarmAdapter(private var interaction: Interaction? = null, private val context: Context) :
@@ -139,16 +140,17 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
     }
 
     class HeaderViewHolder(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
+
         @SuppressLint("SetTextI18n")
         fun bind() = with(itemView) {
-            itemView.header_content_TV.text = "Wake App or just wake nap..."
+            itemView.header_content_TV.text = "It\'s time to wake app!"
             setDate(itemView.header_title_TV)
 
             itemView.header_settings_IB.setOnClickListener {
                 interaction?.onSettingsClicked()
             }
 
-            itemView.header_content_TV.text = nextAlarmTimeLeft(context)
+//            itemView.header_content_TV .text = nextAlarmTimeLeft(context)
         }
 
         @SuppressLint("SimpleDateFormat")

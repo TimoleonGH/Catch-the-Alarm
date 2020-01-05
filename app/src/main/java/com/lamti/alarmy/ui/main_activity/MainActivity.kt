@@ -109,9 +109,7 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         revealAnimation.start()
     }
 
-    private fun getFabWidth(): Float {
-        return add_alarm_IV.width.toFloat()
-    }
+    private fun getFabWidth(): Float = add_alarm_IV.width.toFloat()
 
     private fun delayedStartNextActivity() {
         Handler().postDelayed(Runnable {

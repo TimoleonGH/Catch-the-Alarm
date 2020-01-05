@@ -120,7 +120,8 @@ class AlarmyActivity : AppCompatActivity() {
         }
 
         alarmy_snooze_TV.setOnClickListener {
-            this.showToast("Snooze is coming soon enough!")
+            alarmy_snooze_TV.text = "Snooze? What are you, a kitty?"
+            alarmy_snooze_TV.backgroundTintList = resources.getColorStateList(R.color.colorRed)
         }
     }
 
