@@ -45,9 +45,14 @@ class AlarmyReceiver : BroadcastReceiver() {
         val type = object : TypeToken<Alarm>() {}.type
         val json = Gson().toJson(alarm, type)
         alarmyIntent.putExtra(ALARM_DATA_EXTRA, json)
+        alarmyIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(alarmyIntent)
     }
 
-    private fun launchMainActivity(context: Context?) = context?.startActivity(Intent(context, MainActivity::class.java))
+    private fun launchMainActivity(context: Context?) {
+        val mainIntent = Intent(context, MainActivity::class.java)
+        mainIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context?.startActivity(mainIntent)
+    }
 
 }
