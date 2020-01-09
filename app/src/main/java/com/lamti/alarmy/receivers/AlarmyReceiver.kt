@@ -19,11 +19,11 @@ class AlarmyReceiver : BroadcastReceiver() {
 
         val aca = Calendar.getInstance()
         aca.timeInMillis = cAlarm.miliTime
-        val alarmHour = aca.get(Calendar.HOUR)
+        val alarmHour = aca.get(Calendar.HOUR_OF_DAY)
         val alarmMinute = aca.get(Calendar.MINUTE)
 
         val nowCal = Calendar.getInstance()
-        val nowHour = nowCal.get(Calendar.HOUR)
+        val nowHour = nowCal.get(Calendar.HOUR_OF_DAY)
         val nowMinute = nowCal.get(Calendar.MINUTE)
 
         Log.d("ALARMARA", "now: $nowHour:$nowMinute, alarm: $alarmHour:$alarmMinute")

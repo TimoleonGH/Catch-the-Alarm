@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.lamti.alarmy.data.models.Alarm
 import java.util.*
 import kotlin.collections.ArrayList
@@ -84,7 +85,7 @@ object AlarmyManager {
         // set the alarm time
         val aca = Calendar.getInstance()
         aca.timeInMillis = alarm.miliTime
-        alarmCalendar.set(Calendar.HOUR, aca.get(Calendar.HOUR))
+        alarmCalendar.set(Calendar.HOUR_OF_DAY, aca.get(Calendar.HOUR_OF_DAY))
         alarmCalendar.set(Calendar.MINUTE, aca.get(Calendar.MINUTE))
         alarmCalendar.set(Calendar.SECOND, 0)
 
