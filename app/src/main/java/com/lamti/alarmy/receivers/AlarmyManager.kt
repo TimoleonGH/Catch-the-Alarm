@@ -58,7 +58,7 @@ object AlarmyManager {
         var alarmDayFound = false
 
         // if alarm time is sooner than current time (or alarm stopped from AlarmyActivity) go to next day
-        if (System.currentTimeMillis() > alarm.miliTime  || nextAlarmFlag) {
+        if (System.currentTimeMillis() > alarm.miliTime || nextAlarmFlag) {
             currentWeekDay += 1
             alarmDay = currentWeekDay
         }

@@ -54,6 +54,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:id="@+id/header_settings_IB"
+                android:visibility="invisible"
 
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_settings"

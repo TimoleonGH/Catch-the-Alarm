@@ -28,7 +28,7 @@ class AlarmyReceiver : BroadcastReceiver() {
 
         Log.d("ALARMARA", "now: $nowHour:$nowMinute, alarm: $alarmHour:$alarmMinute")
 
-        if ( nowHour == alarmHour && nowMinute == alarmMinute )
+        if (nowHour == alarmHour && nowMinute == alarmMinute)
             launchAlarmyActivity(context, cAlarm)
         else
             launchMainActivity(context)

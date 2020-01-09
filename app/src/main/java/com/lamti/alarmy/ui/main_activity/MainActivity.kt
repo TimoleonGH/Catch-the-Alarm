@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
     }
 
 
-
     private fun initRecyclerView() {
         alarms_RV.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -110,9 +109,7 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         revealAnimation.start()
     }
 
-    private fun getFabWidth(): Float {
-        return add_alarm_IV.width.toFloat()
-    }
+    private fun getFabWidth(): Float = add_alarm_IV.width.toFloat()
 
     private fun delayedStartNextActivity() {
         Handler().postDelayed(Runnable {
