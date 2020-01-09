@@ -16,7 +16,6 @@ import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.receivers.AlarmyManager
 import com.lamti.alarmy.ui.main_activity.MainVieModel
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import com.lamti.alarmy.utils.showToast
 import kotlinx.android.synthetic.main.activity_alarmy.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
@@ -116,7 +115,8 @@ class AlarmyActivity : AppCompatActivity() {
                 if (alarm.intDays?.size == 1) {
                     // start next alarm after one minute (and something) to prevent from ringing again
                     Handler().postDelayed(Runnable {
-                        alarmyManager.addAlarm(alarm, this, true)
+                        if (alarm.isOn)
+                            alarmyManager.addAlarm(alarm, this, true)
                     }, 62 * 1000)
                 } else
                     alarmyManager.addAlarm(alarm, this, true)
