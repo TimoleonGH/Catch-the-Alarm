@@ -26,7 +26,6 @@ import android.animation.PropertyValuesHolder
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.animation.TranslateAnimation
-import kotlin.system.exitProcess
 
 
 class AlarmyActivity : AppCompatActivity() {
@@ -113,7 +112,14 @@ class AlarmyActivity : AppCompatActivity() {
                     alarmyManager.cancelAlarm(alarm, applicationContext)
                 }
             } else {
-                alarmyManager.addAlarm(alarm, this, true)
+                // Check if repeating alarm has only one day to fix the above bug
+                if (alarm.intDays?.size == 1) {
+                    // start next alarm after one minute (and something) to prevent from ringing again
+                    Handler().postDelayed(Runnable {
+                        alarmyManager.addAlarm(alarm, this, true)
+                    }, 62 * 1000)
+                } else
+                    alarmyManager.addAlarm(alarm, this, true)
             }
 
             closeApp()
