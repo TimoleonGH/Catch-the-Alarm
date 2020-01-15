@@ -1,5 +1,7 @@
 package com.lamti.alarmy.ui
 
+import android.app.AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED
+import android.content.IntentFilter
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +12,7 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.receivers.AlarmyReceiver
 import com.lamti.alarmy.ui.main_activity.MainVieModel
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.utils.changeIconColor
@@ -26,6 +29,7 @@ class NewAlarmActivity : AppCompatActivity() {
     private val decimalFormat = DecimalFormat("00")
     private val mainVieModel: MainVieModel by viewModel()
     private val alarmyManager = AlarmyManager
+    private val alarmyReceiver: AlarmyReceiver = AlarmyReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -161,6 +165,8 @@ class NewAlarmActivity : AppCompatActivity() {
                     finish()
                 }
             }
+
+//            registerAlarmyReceiver()
         }
     }
 
@@ -211,4 +217,14 @@ class NewAlarmActivity : AppCompatActivity() {
             if (new_alarm_message_ET.text.isNullOrEmpty()) "" else new_alarm_message_ET.text.toString()
     }
 
+    private fun registerAlarmyReceiver() {
+        registerReceiver(
+            alarmyReceiver,
+            IntentFilter(ACTION_NEXT_ALARM_CLOCK_CHANGED)
+        )
+    }
+
+    private fun unregisterAlarmyReceiver() {
+        unregisterReceiver(alarmyReceiver)
+    }
 }

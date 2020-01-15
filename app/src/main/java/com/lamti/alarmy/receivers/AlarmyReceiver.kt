@@ -15,7 +15,8 @@ import java.util.*
 class AlarmyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val cAlarm = getAlarm(intent)
+        Log.d("ALARMARA", "APAPAPAPAPAPA")
+        val cAlarm = getAlarm(intent) ?: return
 
         val aca = Calendar.getInstance()
         aca.timeInMillis = cAlarm.miliTime
@@ -34,10 +35,13 @@ class AlarmyReceiver : BroadcastReceiver() {
             launchMainActivity(context)
     }
 
-    private fun getAlarm(intent: Intent?): Alarm {
+    private fun getAlarm(intent: Intent?): Alarm? {
         val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
         val type = object : TypeToken<Alarm>() {}.type
-        return Gson().fromJson(stringLocation, type)
+        return if (stringLocation == null)
+            null
+        else
+            Gson().fromJson(stringLocation, type)
     }
 
     private fun launchAlarmyActivity(context: Context?, alarm: Alarm) {

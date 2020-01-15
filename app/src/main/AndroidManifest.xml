@@ -33,7 +33,6 @@
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -49,12 +48,16 @@
         <activity
             android:name=".ui.main_activity.MainActivity"
             android:screenOrientation="portrait" />
-
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
-        <receiver android:name=".receivers.AlarmyReceiver" />
+        <receiver android:name=".receivers.AlarmyReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.app.action.NEXT_ALARM_CLOCK_CHANGED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".receivers.RebootReceiver"
             android:enabled="false">

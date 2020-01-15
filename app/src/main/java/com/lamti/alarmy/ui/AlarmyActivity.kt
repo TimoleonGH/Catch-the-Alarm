@@ -22,9 +22,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.*
 import android.util.DisplayMetrics
 import android.view.animation.TranslateAnimation
+import com.lamti.alarmy.receivers.AlarmyReceiver
 
 
 class AlarmyActivity : AppCompatActivity() {
