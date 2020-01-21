@@ -11,7 +11,7 @@ import com.lamti.alarmy.R
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.AlarmyManager
 import com.lamti.alarmy.receivers.AlarmyReceiver
 import com.lamti.alarmy.ui.main_activity.MainVieModel
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA

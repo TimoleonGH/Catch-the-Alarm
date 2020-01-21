@@ -70,6 +70,8 @@
                 <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
         </receiver>
+
+        <service android:name=".AlarmyNotificationService" />
     </application>
 
 </manifest>

@@ -1,15 +1,15 @@
-package com.lamti.alarmy.receivers
+package com.lamti.alarmy
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import com.lamti.alarmy.data.models.Alarm
 import java.util.*
 import kotlin.collections.ArrayList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lamti.alarmy.receivers.AlarmyReceiver
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.utils.getTimeInMillis
 
@@ -50,7 +50,12 @@ object AlarmyManager {
 
             alarmMgr?.setAlarmClock(info, pIntent)
         } else
-            addRepeatingAlarm(alarm, context, pIntent, nextAlarmFlag)
+            addRepeatingAlarm(
+                alarm,
+                context,
+                pIntent,
+                nextAlarmFlag
+            )
     }
 
     private fun addRepeatingAlarm(alarm: Alarm, context: Context, pIntent: PendingIntent, nextAlarmFlag: Boolean) {

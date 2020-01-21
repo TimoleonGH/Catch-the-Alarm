@@ -3,9 +3,9 @@ package com.lamti.alarmy.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lamti.alarmy.AlarmyNotificationService
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.ui.AlarmyActivity
 import com.lamti.alarmy.ui.main_activity.MainActivity
@@ -15,7 +15,7 @@ import java.util.*
 class AlarmyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("ALARMARA", "APAPAPAPAPAPA")
+        if (context == null) return
         val cAlarm = getAlarm(intent) ?: return
 
         val aca = Calendar.getInstance()
@@ -27,12 +27,17 @@ class AlarmyReceiver : BroadcastReceiver() {
         val nowHour = nowCal.get(Calendar.HOUR_OF_DAY)
         val nowMinute = nowCal.get(Calendar.MINUTE)
 
-        Log.d("ALARMARA", "now: $nowHour:$nowMinute, alarm: $alarmHour:$alarmMinute")
 
-        if (nowHour == alarmHour && nowMinute == alarmMinute)
-            launchAlarmyActivity(context, cAlarm)
-        else
-            launchMainActivity(context)
+        val type = object : TypeToken<Alarm>() {}.type
+        val json = Gson().toJson(cAlarm, type)
+        AlarmyNotificationService.startService(context, "Foreground Service is running...", json)
+
+//        val flag = nowHour == alarmHour && nowMinute == alarmMinute
+//        if (flag) {
+//            launchAlarmyActivity(context, cAlarm)
+//        } else {
+//            launchMainActivity(context)
+//        }
     }
 
     private fun getAlarm(intent: Intent?): Alarm? {

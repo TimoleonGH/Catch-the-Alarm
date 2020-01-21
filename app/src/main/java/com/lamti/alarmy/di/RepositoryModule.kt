@@ -5,7 +5,6 @@ import androidx.annotation.NonNull
 import androidx.room.Room
 import com.lamti.alarmy.data.local.AlarmsDao
 import com.lamti.alarmy.data.local.AlarmsDatabase
-import com.lamti.alarmy.receivers.AlarmyManager
 import com.lamti.alarmy.ui.main_activity.AlarmAdapter
 import org.koin.dsl.module
 

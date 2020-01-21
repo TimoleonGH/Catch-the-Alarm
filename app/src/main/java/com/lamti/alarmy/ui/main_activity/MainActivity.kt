@@ -11,19 +11,15 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.app.AlarmManager
-import android.content.Context
 import android.view.ViewAnimationUtils
 import android.os.Handler
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.lamti.alarmy.R
-import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.AlarmyManager
 import com.lamti.alarmy.ui.NewAlarmActivity
 import com.lamti.alarmy.ui.SettingsActivity
 import com.lamti.alarmy.utils.*
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {

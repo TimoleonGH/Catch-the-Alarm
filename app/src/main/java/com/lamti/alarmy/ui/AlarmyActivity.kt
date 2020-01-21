@@ -13,7 +13,7 @@ import android.view.WindowManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.receivers.AlarmyManager
+import com.lamti.alarmy.AlarmyManager
 import com.lamti.alarmy.ui.main_activity.MainVieModel
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
 import kotlinx.android.synthetic.main.activity_alarmy.*
@@ -22,12 +22,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.content.Intent
-import android.content.IntentFilter
+import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.os.*
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.animation.TranslateAnimation
-import com.lamti.alarmy.receivers.AlarmyReceiver
+import com.lamti.alarmy.AlarmyNotificationService
 
 
 class AlarmyActivity : AppCompatActivity() {
@@ -43,7 +44,8 @@ class AlarmyActivity : AppCompatActivity() {
         setFullscreen()
         setContentView(R.layout.activity_alarmy)
 
-        initAll()
+        Log.d("APAPA", "extra: ${intent?.getStringExtra(ALARM_DATA_EXTRA)}")
+//        initAll()
         clickListeners()
     }
 
@@ -113,7 +115,9 @@ class AlarmyActivity : AppCompatActivity() {
                 mainVieModel.updateAlarm(alarm).invokeOnCompletion {
                     alarmyManager.cancelAlarm(alarm, applicationContext)
                 }
+                AlarmyNotificationService.stopService(this)
             } else {
+                AlarmyNotificationService.stopService(this)
                 // Check if repeating alarm has only one day to fix the above bug
                 if (alarm.intDays?.size == 1) {
                     // start next alarm after one minute (and something) to prevent from ringing again
