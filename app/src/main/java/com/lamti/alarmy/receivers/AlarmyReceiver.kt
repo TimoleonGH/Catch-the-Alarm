@@ -27,17 +27,16 @@ class AlarmyReceiver : BroadcastReceiver() {
         val nowHour = nowCal.get(Calendar.HOUR_OF_DAY)
         val nowMinute = nowCal.get(Calendar.MINUTE)
 
-
-        val type = object : TypeToken<Alarm>() {}.type
-        val json = Gson().toJson(cAlarm, type)
-        AlarmyNotificationService.startService(context, "Foreground Service is running...", json)
-
-//        val flag = nowHour == alarmHour && nowMinute == alarmMinute
-//        if (flag) {
-//            launchAlarmyActivity(context, cAlarm)
-//        } else {
-//            launchMainActivity(context)
-//        }
+        if (nowHour == alarmHour && nowMinute == alarmMinute) {
+            val json = alarmToJsonMapper(cAlarm)
+            AlarmyNotificationService.startService(
+                context, "Foreground Service is running...", json
+            )
+        } else {
+            AlarmyNotificationService.startService(
+                context, "Foreground Service is running...", null
+            )
+        }
     }
 
     private fun getAlarm(intent: Intent?): Alarm? {
@@ -47,6 +46,11 @@ class AlarmyReceiver : BroadcastReceiver() {
             null
         else
             Gson().fromJson(stringLocation, type)
+    }
+
+    private fun alarmToJsonMapper(alarm: Alarm): String {
+        val type = object : TypeToken<Alarm>() {}.type
+        return Gson().toJson(alarm, type)
     }
 
     private fun launchAlarmyActivity(context: Context?, alarm: Alarm) {

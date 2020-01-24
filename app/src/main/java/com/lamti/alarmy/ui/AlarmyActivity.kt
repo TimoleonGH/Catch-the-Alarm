@@ -1,11 +1,5 @@
 package com.lamti.alarmy.ui
 
-import android.content.Context
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import com.lamti.alarmy.R
@@ -22,19 +16,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.os.*
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.animation.TranslateAnimation
 import com.lamti.alarmy.AlarmyNotificationService
+import com.lamti.alarmy.utils.MediaPlayerManager.startMediaPlayer
+import com.lamti.alarmy.utils.MediaPlayerManager.stopMediaPlayer
+import com.lamti.alarmy.utils.Vibrator.stopVibration
+import com.lamti.alarmy.utils.Vibrator.vibrate
 
 
 class AlarmyActivity : AppCompatActivity() {
-
-    private var mediaPlayer: MediaPlayer? = null
-    private var vibrator: Vibrator? = null
     private lateinit var alarm: Alarm
     private val alarmyManager = AlarmyManager
     private val mainVieModel: MainVieModel by viewModel()
@@ -84,8 +77,8 @@ class AlarmyActivity : AppCompatActivity() {
 
         pulseAnimation()
 
-        startMediaPlayer(getAlarmUri())
-        if (alarm.vibration) vibrate()
+        startMediaPlayer(applicationContext)
+        if (alarm.vibration) vibrate(applicationContext)
         if (alarm.game) game()
         snooze()
     }
@@ -141,58 +134,6 @@ class AlarmyActivity : AppCompatActivity() {
     private fun closeApp() {
         finishAndRemoveTask()
     }
-
-
-    // ~~~~~~~~~~ SOUND ~~~~~~~~~~
-    private fun startMediaPlayer(uri: Uri?) {
-        mediaPlayer = MediaPlayer()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            val audioAttributes = AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build()
-            mediaPlayer!!.setAudioAttributes(audioAttributes)
-        } else {
-            mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_RING)
-        }
-
-        mediaPlayer!!.setDataSource(this, uri)
-        try {
-            mediaPlayer!!.prepare()
-        } catch (e: Exception) {
-        }
-
-        mediaPlayer!!.start()
-    }
-
-    private fun getAlarmUri(): Uri? {
-        var alert: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        if (alert == null) {
-            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            if (alert == null)
-                alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        }
-        return alert
-    }
-
-    private fun stopMediaPlayer() = mediaPlayer!!.stop()
-
-
-
-    // ~~~~~~~~~~ VIBRATION ~~~~~~~~~~
-    private fun vibrate() {
-        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val mVibratePattern = longArrayOf(0, 750, 0, 0, 0, 0, 10, 0, 0, 0)
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibrator?.vibrate(VibrationEffect.createWaveform(mVibratePattern, 0))
-//            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
-        } else {
-            vibrator?.vibrate(mVibratePattern, 0)
-        }
-    }
-
-    private fun stopVibration() = vibrator?.cancel()
-
 
 
     // ~~~~~~~~~~ GAME ~~~~~~~~~~

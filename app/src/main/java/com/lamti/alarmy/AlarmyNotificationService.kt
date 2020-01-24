@@ -4,12 +4,24 @@ import android.app.*
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.ui.AlarmyActivity
 import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
+import com.lamti.alarmy.utils.MediaPlayerManager.startMediaPlayer
+import com.lamti.alarmy.utils.Vibrator.vibrate
 
 
 class AlarmyNotificationService : Service() {
@@ -20,10 +32,15 @@ class AlarmyNotificationService : Service() {
         private const val FOREGROUND_NOTIFICATION_ID = 1
         private const val FOREGROUND_NOTIFICATION_CHANNEL_ID = "wake_app_alarm_id"
 
-        fun startService(context: Context, message: String, alarm: String) {
-            val startIntent = Intent(context, AlarmyNotificationService::class.java)
+        fun startService(context: Context, message: String, alarm: String?) {
+            var startIntent = Intent(context, AlarmyNotificationService::class.java)
             startIntent.putExtra(FOREGROUND_INPUT_EXTRA, message)
             startIntent.putExtra(ALARM_DATA_EXTRA, alarm)
+
+            if (alarm == null) {
+                startIntent = Intent(context, AlarmyActivity::class.java)
+            }
+
             ContextCompat.startForegroundService(context, startIntent)
         }
 
@@ -36,26 +53,14 @@ class AlarmyNotificationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
 
-        val alarmyIntent = Intent(this, AlarmyActivity::class.java)
-        alarmyIntent.putExtra(ALARM_DATA_EXTRA, intent?.getStringExtra(ALARM_DATA_EXTRA))
+        startForeground(FOREGROUND_NOTIFICATION_ID, createNotification(intent))
 
-        val stackBuilder: TaskStackBuilder = TaskStackBuilder.create(this)
-        stackBuilder.addParentStack(AlarmyActivity::class.java)
-        stackBuilder.addNextIntent(alarmyIntent)
+        val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
+        val type = object : TypeToken<Alarm>() {}.type
+        val alarm: Alarm = Gson().fromJson(stringLocation, type)
 
-        val pendingIntent: PendingIntent = stackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT)
-        val actionBuilder =
-            NotificationCompat.Action.Builder(R.drawable.ic_add_alarm, "View Offers", pendingIntent)
-
-        val notification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(FOREGROUND_NOTIFICATION_TITLE)
-            .setContentText(intent?.getStringExtra(FOREGROUND_INPUT_EXTRA))
-            .setSmallIcon(R.drawable.ic_add_alarm)
-            .setContentIntent(pendingIntent)
-            .addAction(actionBuilder.build())
-            .build()
-
-        startForeground(FOREGROUND_NOTIFICATION_ID, notification)
+        if (alarm.vibration) vibrate(applicationContext)
+        startMediaPlayer(applicationContext)
 
         return START_NOT_STICKY
     }
@@ -73,5 +78,26 @@ class AlarmyNotificationService : Service() {
             val manager = getSystemService(NotificationManager::class.java)
             manager!!.createNotificationChannel(serviceChannel)
         }
+    }
+
+    private fun createNotification(intent: Intent?): Notification {
+        val alarmyIntent = Intent(this, AlarmyActivity::class.java)
+        alarmyIntent.putExtra(ALARM_DATA_EXTRA, intent?.getStringExtra(ALARM_DATA_EXTRA))
+
+        val stackBuilder: TaskStackBuilder = TaskStackBuilder.create(this)
+        stackBuilder.addParentStack(AlarmyActivity::class.java)
+        stackBuilder.addNextIntent(alarmyIntent)
+
+        val pendingIntent: PendingIntent = stackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT)
+        val actionBuilder =
+            NotificationCompat.Action.Builder(R.drawable.ic_add_alarm, "Action", pendingIntent)
+
+        return NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(FOREGROUND_NOTIFICATION_TITLE)
+            .setContentText(intent?.getStringExtra(FOREGROUND_INPUT_EXTRA))
+            .setSmallIcon(R.drawable.ic_add_alarm)
+            .setContentIntent(pendingIntent)
+            .addAction(actionBuilder.build())
+            .build()
     }
 }
