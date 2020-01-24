@@ -45,7 +45,7 @@ class AlarmyActivity : AppCompatActivity() {
         setContentView(R.layout.activity_alarmy)
 
         Log.d("APAPA", "extra: ${intent?.getStringExtra(ALARM_DATA_EXTRA)}")
-//        initAll()
+        initAll()
         clickListeners()
     }
 

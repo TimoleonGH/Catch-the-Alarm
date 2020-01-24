@@ -36,13 +36,6 @@ class AlarmyNotificationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
 
-//        val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
-//        val type = object : TypeToken<Alarm>() {}.type
-//        val alarm: Alarm = Gson().fromJson(stringLocation, type)
-//
-//        val typeS = object : TypeToken<Alarm>() {}.type
-//        val json = Gson().toJson(alarm, typeS)
-
         val alarmyIntent = Intent(this, AlarmyActivity::class.java)
         alarmyIntent.putExtra(ALARM_DATA_EXTRA, intent?.getStringExtra(ALARM_DATA_EXTRA))
 
@@ -61,17 +54,6 @@ class AlarmyNotificationService : Service() {
             .setContentIntent(pendingIntent)
             .addAction(actionBuilder.build())
             .build()
-
-//        val input = intent?.getStringExtra(ALARM_DATA_EXTRA)
-//        val notificationIntent = Intent(this, AlarmyActivity::class.java)
-//        notificationIntent.putExtra(ALARM_DATA_EXTRA, input)
-//        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
-//        val notification = NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
-//            .setContentTitle(FOREGROUND_NOTIFICATION_TITLE)
-//            .setContentText(input)
-//            .setSmallIcon(R.drawable.ic_add_alarm)
-//            .setContentIntent(pendingIntent)
-//            .build()
 
         startForeground(FOREGROUND_NOTIFICATION_ID, notification)
 
