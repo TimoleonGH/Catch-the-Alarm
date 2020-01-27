@@ -1,30 +1,32 @@
 package com.lamti.alarmy.ui
 
-import androidx.appcompat.app.AppCompatActivity
-import android.view.View
-import com.lamti.alarmy.R
-import android.view.WindowManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.AlarmyManager
-import com.lamti.alarmy.ui.main_activity.MainVieModel
-import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import kotlinx.android.synthetic.main.activity_alarmy.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.SimpleDateFormat
-import java.util.*
+import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.os.*
+import android.animation.ValueAnimator
+import android.os.Bundle
+import android.os.Handler
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.animation.TranslateAnimation
+import android.view.View
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.lamti.alarmy.AlarmyManager
 import com.lamti.alarmy.AlarmyNotificationService
+import com.lamti.alarmy.R
+import com.lamti.alarmy.data.models.Alarm
+import com.lamti.alarmy.ui.main_activity.MainVieModel
+import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.utils.MediaPlayerManager.startMediaPlayer
 import com.lamti.alarmy.utils.MediaPlayerManager.stopMediaPlayer
 import com.lamti.alarmy.utils.Vibrator.stopVibration
 import com.lamti.alarmy.utils.Vibrator.vibrate
+import kotlinx.android.synthetic.main.activity_alarmy.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class AlarmyActivity : AppCompatActivity() {
@@ -136,27 +138,66 @@ class AlarmyActivity : AppCompatActivity() {
     }
 
 
-    // ~~~~~~~~~~ GAME ~~~~~~~~~~
     private fun game() {
+        alarmy_stop_alarm_IV.fadeAnimation()
+    }
 
+    fun View.fadeAnimation1(value: Float, duration: Long) {
+        this.animate()
+            .alpha(value)
+            .setDuration(duration)
+            .start()
+    }
+
+    fun View.fadeAnimation(duration: Long = 500) {
+        val objectAnimator = ObjectAnimator.ofFloat(this, "translationX", getRandomX())
+        objectAnimator.repeatMode = ValueAnimator.REVERSE
+        objectAnimator.duration = duration
+        objectAnimator.start()
+
+        val objectAnimatorY = ObjectAnimator.ofFloat(this, "translationY", getRandomY())
+        objectAnimatorY.repeatMode = ValueAnimator.REVERSE
+        objectAnimatorY.duration = duration
+        objectAnimatorY.start()
+
+        objectAnimator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animator: Animator) {
+
+            }
+
+            override fun onAnimationEnd(animator: Animator) {
+                objectAnimator.start()
+                objectAnimatorY.start()
+            }
+
+            override fun onAnimationCancel(animator: Animator) {}
+            override fun onAnimationRepeat(animator: Animator) {}
+        })
+    }
+
+    private fun getRandomX(): Float {
+        val r = Random()
+        return r.nextInt(getScreenWidthSize()).toFloat()
+    }
+
+    private fun getRandomY(): Float {
+        val r = Random()
+        return r.nextInt(getScreenHeightSize()).toFloat()
+    }
+
+    private fun getScreenWidthSize(): Int {
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val width = displayMetrics.widthPixels
-        val height = displayMetrics.heightPixels
+        return displayMetrics.widthPixels
+    }
 
-        val r = Random()
-        val translationX = r.nextInt(width).toFloat()
-        val translationY = r.nextInt(height).toFloat()
-
-        val anim = TranslateAnimation( alarmy_stop_alarm_IV.x, translationX , alarmy_stop_alarm_IV.y, translationY )
-        anim.duration = 1000
-        anim.fillAfter = true
-
-        alarmy_stop_alarm_IV.startAnimation(anim)
+    private fun getScreenHeightSize(): Int {
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        return displayMetrics.heightPixels
     }
 
 
-    // ~~~~~~~~~~ SNOOZE ~~~~~~~~~~
     private fun snooze() {
         if (alarm.snooze)
             alarmy_snooze_TV.visibility = View.VISIBLE
