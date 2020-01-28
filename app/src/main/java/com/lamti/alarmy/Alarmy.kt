@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.ComponentName
 import android.content.pm.PackageManager
 import com.lamti.alarmy.di.appModules
-import com.lamti.alarmy.receivers.RebootReceiver
+import com.lamti.alarmy.domain.receivers.RebootReceiver
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 

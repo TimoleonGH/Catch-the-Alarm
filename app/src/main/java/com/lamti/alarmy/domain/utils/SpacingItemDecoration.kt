@@ -1,4 +1,4 @@
-package com.lamti.alarmy.utils
+package com.lamti.alarmy.domain.utils
 
 import android.graphics.Canvas
 import android.graphics.Rect

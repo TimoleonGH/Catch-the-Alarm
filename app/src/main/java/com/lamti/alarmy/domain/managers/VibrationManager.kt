@@ -1,11 +1,11 @@
-package com.lamti.alarmy.utils
+package com.lamti.alarmy.domain.managers
 
 import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 
-object Vibrator {
+object VibrationManager {
     private var vibrator: Vibrator? = null
 
     fun vibrate(context: Context) {

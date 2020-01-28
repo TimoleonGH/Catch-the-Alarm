@@ -1,4 +1,4 @@
-package com.lamti.alarmy.utils
+package com.lamti.alarmy.domain.managers
 
 import android.content.Context
 import android.media.AudioAttributes

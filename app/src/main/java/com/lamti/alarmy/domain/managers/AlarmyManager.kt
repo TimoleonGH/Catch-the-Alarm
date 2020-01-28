@@ -1,4 +1,4 @@
-package com.lamti.alarmy
+package com.lamti.alarmy.domain.managers
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -9,9 +9,9 @@ import java.util.*
 import kotlin.collections.ArrayList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.lamti.alarmy.receivers.AlarmyReceiver
-import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import com.lamti.alarmy.utils.getTimeInMillis
+import com.lamti.alarmy.domain.receivers.AlarmyReceiver
+import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
+import com.lamti.alarmy.domain.utils.getTimeInMillis
 
 
 object AlarmyManager {

@@ -1,27 +1,21 @@
-package com.lamti.alarmy
+package com.lamti.alarmy.domain.services
 
 import android.app.*
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.IBinder
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.lamti.alarmy.R
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.ui.AlarmyActivity
-import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import com.lamti.alarmy.utils.MediaPlayerManager.startMediaPlayer
-import com.lamti.alarmy.utils.Vibrator.vibrate
+import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
+import com.lamti.alarmy.domain.managers.MediaPlayerManager.startMediaPlayer
+import com.lamti.alarmy.domain.managers.VibrationManager.vibrate
 
 
 class AlarmyNotificationService : Service() {
@@ -72,7 +66,8 @@ class AlarmyNotificationService : Service() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
-                FOREGROUND_NOTIFICATION_CHANNEL_ID, FOREGROUND_NOTIFICATION_CHANNEL,
+                FOREGROUND_NOTIFICATION_CHANNEL_ID,
+                FOREGROUND_NOTIFICATION_CHANNEL,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             val manager = getSystemService(NotificationManager::class.java)
@@ -92,7 +87,10 @@ class AlarmyNotificationService : Service() {
         val actionBuilder =
             NotificationCompat.Action.Builder(R.drawable.ic_add_alarm, "Action", pendingIntent)
 
-        return NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(
+            this,
+            FOREGROUND_NOTIFICATION_CHANNEL_ID
+        )
             .setContentTitle(FOREGROUND_NOTIFICATION_TITLE)
             .setContentText(intent?.getStringExtra(FOREGROUND_INPUT_EXTRA))
             .setSmallIcon(R.drawable.ic_add_alarm)

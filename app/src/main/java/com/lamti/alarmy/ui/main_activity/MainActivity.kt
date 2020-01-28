@@ -16,10 +16,10 @@ import android.os.Handler
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.lamti.alarmy.R
-import com.lamti.alarmy.AlarmyManager
+import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.ui.NewAlarmActivity
 import com.lamti.alarmy.ui.SettingsActivity
-import com.lamti.alarmy.utils.*
+import com.lamti.alarmy.domain.utils.*
 
 
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {

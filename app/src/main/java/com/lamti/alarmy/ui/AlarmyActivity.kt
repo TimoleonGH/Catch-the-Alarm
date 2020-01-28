@@ -1,28 +1,27 @@
 package com.lamti.alarmy.ui
 
-import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.lamti.alarmy.AlarmyManager
-import com.lamti.alarmy.AlarmyNotificationService
+import com.lamti.alarmy.domain.managers.AlarmyManager
+import com.lamti.alarmy.domain.services.AlarmyNotificationService
 import com.lamti.alarmy.R
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.ui.main_activity.MainVieModel
-import com.lamti.alarmy.utils.ALARM_DATA_EXTRA
-import com.lamti.alarmy.utils.MediaPlayerManager.startMediaPlayer
-import com.lamti.alarmy.utils.MediaPlayerManager.stopMediaPlayer
-import com.lamti.alarmy.utils.Vibrator.stopVibration
-import com.lamti.alarmy.utils.Vibrator.vibrate
+import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
+import com.lamti.alarmy.domain.managers.MediaPlayerManager.startMediaPlayer
+import com.lamti.alarmy.domain.managers.MediaPlayerManager.stopMediaPlayer
+import com.lamti.alarmy.domain.managers.VibrationManager.stopVibration
+import com.lamti.alarmy.domain.managers.VibrationManager.vibrate
+import com.lamti.alarmy.domain.utils.randomPositionAnimation
 import kotlinx.android.synthetic.main.activity_alarmy.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
@@ -33,6 +32,7 @@ class AlarmyActivity : AppCompatActivity() {
     private lateinit var alarm: Alarm
     private val alarmyManager = AlarmyManager
     private val mainVieModel: MainVieModel by viewModel()
+    private var gameCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +74,8 @@ class AlarmyActivity : AppCompatActivity() {
         else
             alarmy_text_TV.text = alarm.message
 
-        val dateFormat = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
+        val dateFormat =
+            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
         alarmy_title_TV.text = dateFormat.format(Calendar.getInstance().time)
 
         pulseAnimation()
@@ -94,37 +95,23 @@ class AlarmyActivity : AppCompatActivity() {
         scaleDown.duration = 310
         scaleDown.repeatCount = ObjectAnimator.INFINITE
         scaleDown.repeatMode = ObjectAnimator.REVERSE
-//        scaleDown.start()
 
         layout_ripple_pulse.startRippleAnimation()
     }
 
     private fun clickListeners() {
         alarmy_stop_alarm_IV.setOnClickListener {
-            layout_ripple_pulse.stopRippleAnimation()
-            stopVibration()
-            stopMediaPlayer()
-
-            if (alarm.intDays.isNullOrEmpty()) {
-                alarm.isOn = false
-                mainVieModel.updateAlarm(alarm).invokeOnCompletion {
-                    alarmyManager.cancelAlarm(alarm, applicationContext)
+            if (alarm.game) {
+                if (gameCounter >= 9) {
+                    stopAlarm()
+                } else {
+                    gameCounter++
+                    Toast.makeText(this@AlarmyActivity, "pressed: $gameCounter", Toast.LENGTH_SHORT)
+                        .show()
                 }
-                AlarmyNotificationService.stopService(this)
             } else {
-                AlarmyNotificationService.stopService(this)
-                // Check if repeating alarm has only one day to fix the above bug
-                if (alarm.intDays?.size == 1) {
-                    // start next alarm after one minute (and something) to prevent from ringing again
-                    Handler().postDelayed(Runnable {
-                        if (alarm.isOn)
-                            alarmyManager.addAlarm(alarm, this, true)
-                    }, 62 * 1000)
-                } else
-                    alarmyManager.addAlarm(alarm, this, true)
+                stopAlarm()
             }
-
-            closeApp()
         }
 
         alarmy_snooze_TV.setOnClickListener {
@@ -133,70 +120,40 @@ class AlarmyActivity : AppCompatActivity() {
         }
     }
 
+    private fun stopAlarm() {
+        layout_ripple_pulse.stopRippleAnimation()
+        stopVibration()
+        stopMediaPlayer()
+
+        if (alarm.intDays.isNullOrEmpty()) {
+            alarm.isOn = false
+            mainVieModel.updateAlarm(alarm).invokeOnCompletion {
+                alarmyManager.cancelAlarm(alarm, applicationContext)
+            }
+            AlarmyNotificationService.stopService(this)
+        } else {
+            AlarmyNotificationService.stopService(this)
+            // Check if repeating alarm has only one day to fix the above bug
+            if (alarm.intDays?.size == 1) {
+                // start next alarm after one minute (and something) to prevent from ringing again
+                Handler().postDelayed(Runnable {
+                    if (alarm.isOn)
+                        alarmyManager.addAlarm(alarm, this, true)
+                }, 62 * 1000)
+            } else
+                alarmyManager.addAlarm(alarm, this, true)
+        }
+
+        closeApp()
+    }
+
     private fun closeApp() {
         finishAndRemoveTask()
     }
 
 
-    private fun game() {
-        alarmy_stop_alarm_IV.fadeAnimation()
-    }
-
-    fun View.fadeAnimation1(value: Float, duration: Long) {
-        this.animate()
-            .alpha(value)
-            .setDuration(duration)
-            .start()
-    }
-
-    fun View.fadeAnimation(duration: Long = 500) {
-        val objectAnimator = ObjectAnimator.ofFloat(this, "translationX", getRandomX())
-        objectAnimator.repeatMode = ValueAnimator.REVERSE
-        objectAnimator.duration = duration
-        objectAnimator.start()
-
-        val objectAnimatorY = ObjectAnimator.ofFloat(this, "translationY", getRandomY())
-        objectAnimatorY.repeatMode = ValueAnimator.REVERSE
-        objectAnimatorY.duration = duration
-        objectAnimatorY.start()
-
-        objectAnimator.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(animator: Animator) {
-
-            }
-
-            override fun onAnimationEnd(animator: Animator) {
-                objectAnimator.start()
-                objectAnimatorY.start()
-            }
-
-            override fun onAnimationCancel(animator: Animator) {}
-            override fun onAnimationRepeat(animator: Animator) {}
-        })
-    }
-
-    private fun getRandomX(): Float {
-        val r = Random()
-        return r.nextInt(getScreenWidthSize()).toFloat()
-    }
-
-    private fun getRandomY(): Float {
-        val r = Random()
-        return r.nextInt(getScreenHeightSize()).toFloat()
-    }
-
-    private fun getScreenWidthSize(): Int {
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        return displayMetrics.widthPixels
-    }
-
-    private fun getScreenHeightSize(): Int {
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        return displayMetrics.heightPixels
-    }
-
+    private fun game() =
+        alarmy_stop_alarm_IV.randomPositionAnimation(alarmy_activity_root_CL, windowManager)
 
     private fun snooze() {
         if (alarm.snooze)

@@ -1,4 +1,4 @@
-package com.lamti.alarmy.utils
+package com.lamti.alarmy.domain.utils
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -7,21 +7,23 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.snackbar.Snackbar
 import com.lamti.alarmy.data.models.Alarm
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
-import com.lamti.alarmy.R
-import kotlinx.android.synthetic.main.list_item_simple_alarm.view.*
 import java.util.*
 
 const val ALARM_DATA_EXTRA = "ALARM_DATA_EXTRA"
@@ -115,4 +117,65 @@ fun String.getTimeInMillis(): Long {
     alarmCalendar.set(Calendar.MILLISECOND, 0)
 
     return alarmCalendar.timeInMillis
+}
+
+fun View.randomPositionAnimation(
+    root: ConstraintLayout,
+    windowManager: WindowManager,
+    duration: Long = 650
+) {
+    val view = this
+
+    val anim: Animation = AlphaAnimation(0.0f, 1.0f)
+    anim.duration = duration
+    anim.startOffset = 0
+    anim.repeatMode = Animation.REVERSE
+    anim.repeatCount = Animation.INFINITE
+    view.startAnimation(anim)
+
+    anim.setAnimationListener(object : Animation.AnimationListener {
+        override fun onAnimationRepeat(p0: Animation?) {
+            view.setRandomXYPosition(root, windowManager)
+        }
+
+        override fun onAnimationEnd(p0: Animation?) {
+
+        }
+
+        override fun onAnimationStart(p0: Animation?) {
+
+        }
+
+    })
+}
+
+private fun View.setRandomXYPosition(root: ConstraintLayout, windowManager: WindowManager) {
+    val set = ConstraintSet()
+    set.clone(root)
+    set.setTranslationX(this.id, getRandomX(windowManager) - this.x)
+    set.setTranslationY(this.id, getRandomY(windowManager) - this.y)
+    set.applyTo(root)
+}
+
+
+private fun getRandomX(windowManager: WindowManager): Float {
+    val x = Random().nextInt(getScreenWidthSize(windowManager)) / 2
+    return x.toFloat()
+}
+
+private fun getRandomY(windowManager: WindowManager): Float {
+    val y = Random().nextInt(getScreenHeightSize(windowManager)) / 2
+    return y.toFloat()
+}
+
+private fun getScreenWidthSize(windowManager: WindowManager): Int {
+    val displayMetrics = DisplayMetrics()
+    windowManager.defaultDisplay.getMetrics(displayMetrics)
+    return displayMetrics.widthPixels
+}
+
+private fun getScreenHeightSize(windowManager: WindowManager): Int {
+    val displayMetrics = DisplayMetrics()
+    windowManager.defaultDisplay.getMetrics(displayMetrics)
+    return displayMetrics.heightPixels
 }

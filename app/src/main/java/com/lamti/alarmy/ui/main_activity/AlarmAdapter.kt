@@ -20,9 +20,8 @@ import android.widget.TextView
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import android.text.SpannableString
-import com.lamti.alarmy.utils.changeIconColor
-import com.lamti.alarmy.utils.changeTextColor
-import org.w3c.dom.Text
+import com.lamti.alarmy.domain.utils.changeIconColor
+import com.lamti.alarmy.domain.utils.changeTextColor
 import java.util.concurrent.TimeUnit
 
 class AlarmAdapter(private var interaction: Interaction? = null, private val context: Context) :

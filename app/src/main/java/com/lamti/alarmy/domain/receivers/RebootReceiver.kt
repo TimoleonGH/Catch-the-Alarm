@@ -1,4 +1,4 @@
-package com.lamti.alarmy.receivers
+package com.lamti.alarmy.domain.receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -51,7 +51,9 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-        <receiver android:name=".receivers.AlarmyReceiver"
+
+        <receiver
+            android:name="com.lamti.alarmy.domain.receivers.AlarmyReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -59,19 +61,19 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receivers.RebootReceiver"
+            android:name="com.lamti.alarmy.domain.receivers.RebootReceiver"
             android:enabled="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.TimeChangedReceiver">
+        <receiver android:name="com.lamti.alarmy.domain.receivers.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".AlarmyNotificationService" />
+        <service android:name="com.lamti.alarmy.domain.services.AlarmyNotificationService" />
     </application>
 
 </manifest>
