@@ -54,8 +54,8 @@ object AlarmyManager {
     }
 
     private fun createAlarm(alarm: Alarm, pendingIntent: PendingIntent, nextAlarmFlag: Boolean) {
-        val hasAlarmRepeatingDays = alarm.intDays.isNullOrEmpty()
-        if (hasAlarmRepeatingDays) {
+        val alarmHasNoRepeatingDays = alarm.intDays.isNullOrEmpty()
+        if (alarmHasNoRepeatingDays) {
             addOneTimeAlarm(alarm, pendingIntent)
         } else
             addRepeatingAlarm(alarm, pendingIntent, nextAlarmFlag)

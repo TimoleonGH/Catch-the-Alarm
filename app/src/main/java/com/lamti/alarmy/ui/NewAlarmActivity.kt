@@ -1,18 +1,14 @@
 package com.lamti.alarmy.ui
 
-import android.app.AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED
-import android.content.IntentFilter
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.lamti.alarmy.R
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.domain.managers.AlarmyManager
-import com.lamti.alarmy.domain.receivers.AlarmyReceiver
 import com.lamti.alarmy.ui.main_activity.AlarmVieModel
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.utils.changeIconColor
@@ -29,7 +25,6 @@ class NewAlarmActivity : AppCompatActivity() {
     private val decimalFormat = DecimalFormat("00")
     private val alarmVieModel: AlarmVieModel by viewModel()
     private val alarmyManager = AlarmyManager
-    private val alarmyReceiver: AlarmyReceiver = AlarmyReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +35,15 @@ class NewAlarmActivity : AppCompatActivity() {
         initDaysPicker()
         initMessageET()
         initButtonIcons()
-        clickListeners()
+        setClickListeners()
     }
 
     private fun initAlarm() {
-        val stringLocation = intent.getStringExtra(ALARM_DATA_EXTRA)
-        alarm = if (stringLocation != null) {
+        val stringAlarm = intent.getStringExtra(ALARM_DATA_EXTRA)
+        val thereIsAlarm = stringAlarm != null
+        alarm = if (thereIsAlarm) {
             updateAlarm = true
-            val type = object : TypeToken<Alarm>() {}.type
-            Gson().fromJson(stringLocation, type)
+            getAlarmFromString(stringAlarm)
         } else {
             updateAlarm = false
             Alarm(
@@ -66,8 +61,18 @@ class NewAlarmActivity : AppCompatActivity() {
         }
     }
 
+    private fun getAlarmFromString(stringAlarm: String): Alarm {
+        val type = object : TypeToken<Alarm>() {}.type
+        return Gson().fromJson(stringAlarm, type)
+    }
+
     private fun initTimePicker() {
         new_alarm_time_picker_TP.setIs24HourView(true)
+        setAlarmTimeIfExist()
+        setTimeListener()
+    }
+
+    private fun setAlarmTimeIfExist() {
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
 
@@ -83,7 +88,9 @@ class NewAlarmActivity : AppCompatActivity() {
                     "${decimalFormat.format(currentHour)}:${decimalFormat.format(currentMinute)}"
             }
         }
+    }
 
+    private fun setTimeListener() {
         new_alarm_time_picker_TP.setOnTimeChangedListener { view, hourOfDay, minute ->
 
             val cal = Calendar.getInstance()
@@ -109,20 +116,34 @@ class NewAlarmActivity : AppCompatActivity() {
     }
 
     private fun initButtonIcons() {
+        setIconsColor()
+        setAddAlarmButtonText()
+        setDeleteButtonVisibility()
+    }
+
+    private fun setIconsColor() {
         new_alarm_snooze_IV.changeIconColor(alarm.snooze)
         new_alarm_vibrate_IV.changeIconColor(alarm.vibration)
         new_alarm_game_IV.changeIconColor(alarm.game)
+    }
 
+    private fun setAddAlarmButtonText() {
         if (updateAlarm) {
             new_alarm_add_B.text = getString(R.string.update)
-            new_alarm_delete_IV.visibility = View.VISIBLE
         } else {
             new_alarm_add_B.text = getString(R.string.add)
+        }
+    }
+
+    private fun setDeleteButtonVisibility() {
+        if (updateAlarm) {
+            new_alarm_delete_IV.visibility = View.VISIBLE
+        } else {
             new_alarm_delete_IV.visibility = View.GONE
         }
     }
 
-    private fun clickListeners() {
+    private fun setClickListeners() {
         new_alarm_delete_IV.setOnClickListener {
             alarmyManager.cancelAlarm(alarm, applicationContext)
             alarmVieModel.deleteAlarm(alarm)
@@ -151,30 +172,70 @@ class NewAlarmActivity : AppCompatActivity() {
         new_alarm_add_B.setOnClickListener {
             addSelectedDaysToNewAlarm()
             addMessageToNewAlarm()
-
-            if (updateAlarm) {
-                alarm.isOn = true
-                alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
-                    alarmyManager.addAlarm(alarm, applicationContext)
-                    finish()
-                }
-            } else {
-                alarmVieModel.insert(alarm).invokeOnCompletion {
-                    alarm.id = alarmVieModel.insertedAlarmID.toInt()
-                    alarmyManager.addAlarm(alarm, applicationContext)
-                    finish()
-                }
-            }
-
-//            registerAlarmyReceiver()
+            addOrUpdateAlarm()
         }
     }
 
-    private fun addSelectedDaysToNewAlarm() {
+    private fun addOrUpdateAlarm() {
+        if (updateAlarm) {
+            updateOldAlarm()
+        } else {
+            addNewAlarm()
+        }
+    }
 
+    private fun addNewAlarm() {
+        alarmVieModel.insert(alarm).invokeOnCompletion {
+            alarm.id = alarmVieModel.insertedAlarmID.toInt()
+            addAlarmyManagerAlarm(alarm)
+            finishActivity()
+        }
+    }
+
+    private fun updateOldAlarm() {
+        alarm.isOn = true
+        alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
+            addAlarmyManagerAlarm(alarm)
+            finishActivity()
+        }
+    }
+
+    private fun addAlarmyManagerAlarm(alarm: Alarm) {
+        alarmyManager.addAlarm(alarm, applicationContext)
+    }
+
+    private fun finishActivity() {
+        finish()
+    }
+
+    private fun addSelectedDaysToNewAlarm() {
+        alarm.intDays = getSelectedIntDaysSorted()
+        alarm.days = convertIntDaysToStringDays()
+    }
+
+    private fun convertIntDaysToStringDays(): List<String> {
+        val selectedStringDays = ArrayList<String>()
+        val selectedIntDays = getSelectedIntDaysSorted()
+
+        selectedIntDays.forEach {
+            when (it) {
+                Calendar.SUNDAY -> selectedStringDays.add("Sunday")
+                Calendar.MONDAY -> selectedStringDays.add("Monday")
+                Calendar.TUESDAY -> selectedStringDays.add("Tuesday")
+                Calendar.WEDNESDAY -> selectedStringDays.add("Wednesday")
+                Calendar.THURSDAY -> selectedStringDays.add("Thursday")
+                Calendar.FRIDAY -> selectedStringDays.add("Friday")
+                Calendar.SATURDAY -> selectedStringDays.add("Saturday")
+                else -> ""
+            }
+        }
+
+        return selectedStringDays
+    }
+
+    private fun getSelectedIntDaysSorted(): List<Int> {
         val selectedDays = new_alarm_day_picker_DPV.getSelectedDaysList()
         val selectedIntDays = ArrayList<Int>()
-        val selectedStringDays = ArrayList<String>()
 
         selectedDays.forEach {
             when (it) {
@@ -189,27 +250,8 @@ class NewAlarmActivity : AppCompatActivity() {
         }
 
         selectedIntDays.sort()
-        alarm.intDays = selectedIntDays
 
-        selectedIntDays.forEach {
-            when (it) {
-                Calendar.SUNDAY -> selectedStringDays.add("Sunday")
-                Calendar.MONDAY -> selectedStringDays.add("Monday")
-                Calendar.TUESDAY -> selectedStringDays.add("Tuesday")
-                Calendar.WEDNESDAY -> selectedStringDays.add("Wednesday")
-                Calendar.THURSDAY -> selectedStringDays.add("Thursday")
-                Calendar.FRIDAY -> selectedStringDays.add("Friday")
-                Calendar.SATURDAY -> selectedStringDays.add("Saturday")
-                else -> ""
-            }
-
-        }
-
-        alarm.days = selectedStringDays
-
-        alarm.intDays?.forEachIndexed { index, i ->
-            Log.d("ANALA", "index: $index, day: $i")
-        }
+        return selectedIntDays
     }
 
     private fun addMessageToNewAlarm() {
@@ -217,14 +259,4 @@ class NewAlarmActivity : AppCompatActivity() {
             if (new_alarm_message_ET.text.isNullOrEmpty()) "" else new_alarm_message_ET.text.toString()
     }
 
-    private fun registerAlarmyReceiver() {
-        registerReceiver(
-            alarmyReceiver,
-            IntentFilter(ACTION_NEXT_ALARM_CLOCK_CHANGED)
-        )
-    }
-
-    private fun unregisterAlarmyReceiver() {
-        unregisterReceiver(alarmyReceiver)
-    }
 }

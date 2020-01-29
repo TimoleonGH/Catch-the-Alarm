@@ -27,7 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-private const val GAME_COUNTER_GOAL = 3
+private const val GAME_COUNTER_GOAL = 2
 
 class AlarmyActivity : AppCompatActivity() {
     private val alarmyManager = AlarmyManager

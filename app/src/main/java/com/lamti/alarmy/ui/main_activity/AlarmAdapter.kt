@@ -36,7 +36,7 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
         interaction = listener
     }
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Alarm>() {
+    private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Alarm>() {
 
         override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
             return oldItem.id == newItem.id
@@ -84,7 +84,6 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
         return when (position) {
             0 -> TYPE_HEADER
             else -> TYPE_ITEM
-//            else -> throw IllegalArgumentException("Invalid type of data " + position)
         }
     }
 
@@ -98,6 +97,15 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
 
     class SimpleAlarmViewHolder(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
         fun bind(item: Alarm) = with(itemView) {
+            setClickListeners(item)
+
+            setAlarmOn(item)
+            setTime(item)
+            setRepeatingDays(item)
+            changeViewsColor(item)
+        }
+
+        private fun setClickListeners(item: Alarm) {
             itemView.setOnClickListener {
                 interaction?.onItemSelected(adapterPosition, item)
             }
@@ -105,34 +113,59 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
             itemView.simple_item_on_S.setOnClickListener {
                 interaction?.onItemChecked(adapterPosition, item)
             }
+        }
 
+        private fun setAlarmOn(item: Alarm) {
             itemView.simple_item_on_S.isChecked = item.isOn
-            itemView.simple_item_time_TV.text = item.time
-            itemView.simple_item_repeat_TV.text = getDaysString(item)
+        }
 
+        private fun setTime(item: Alarm) {
+            itemView.simple_item_time_TV.text = item.time
+        }
+
+        private fun setRepeatingDays(item: Alarm) {
+            itemView.simple_item_repeat_TV.text = getDaysString(item)
+        }
+
+        private fun changeViewsColor(item: Alarm) {
             itemView.simple_item_time_TV.changeTextColor(item.isOn)
             itemView.simple_item_repeat_TV.changeTextColor(item.isOn)
 
-            itemView.simple_item_message_IV.changeIconColor(!item.message.isEmpty())
+            itemView.simple_item_message_IV.changeIconColor(item.message.isNotEmpty())
             itemView.simple_item_snooze_IV.changeIconColor(item.snooze)
             itemView.simple_item_vibrate_IV.changeIconColor(item.vibration)
             itemView.simple_item_game_IV.changeIconColor(item.game)
         }
 
         private fun getDaysString(item: Alarm): String {
-            var daysText = ""
-            if ( item.days.isNullOrEmpty() ) {
-                daysText = "Today"
+            val alarmHasNoRepeatingDays = item.days.isNullOrEmpty()
+            return if (alarmHasNoRepeatingDays) {
+                "Today"
             } else {
-                if (  item.days!!.size > 3) {
-                    item.days!!.forEach { day ->
-                        daysText += day.substring(IntRange(0,2)) + "  "
-                    }
-                } else {
-                    item.days!!.forEach { day ->
-                        daysText += "$day  "
-                    }
-                }
+                getDays(item)
+            }
+        }
+
+        private fun getDays(item: Alarm): String {
+            return if (item.days!!.size > 3) {
+                getThreeDigitsDays(item)
+            } else {
+                getFullnameDays(item)
+            }
+        }
+
+        private fun getThreeDigitsDays(item: Alarm): String {
+            var daysText = ""
+            item.days!!.forEach { day ->
+                daysText += day.substring(IntRange(0, 2)) + "  "
+            }
+            return daysText
+        }
+
+        private fun getFullnameDays(item: Alarm): String {
+            var daysText = ""
+            item.days!!.forEach { day ->
+                daysText += "$day  "
             }
             return daysText
         }
@@ -142,22 +175,22 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
 
         @SuppressLint("SetTextI18n")
         fun bind() = with(itemView) {
-            itemView.header_content_TV.text = "It\'s time to wake app!"
+            setHeaderTitle(itemView)
+            setClickListeners(itemView)
             setDate(itemView.header_title_TV)
+            // TODO: Add time remaining till next alarm functionality
+            // itemView.header_content_TV .text = nextAlarmTimeLeft(context)
+        }
 
+        private fun setHeaderTitle(itemView: View) {
+            val title = "It\'s time to wake app!"
+            itemView.header_content_TV.text = title
+        }
+
+        private fun setClickListeners(itemView: View) {
             itemView.header_settings_IB.setOnClickListener {
                 interaction?.onSettingsClicked()
             }
-
-//            itemView.header_content_TV .text = nextAlarmTimeLeft(context)
-        }
-
-        @SuppressLint("SimpleDateFormat")
-        private fun getCurrentDate(): String {
-            val simpleDateFormat = SimpleDateFormat("EEE, d MMM")
-            simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-            val today = Calendar.getInstance().time
-            return simpleDateFormat.format(today)
         }
 
         private fun setDate(textView: TextView) {
@@ -175,6 +208,15 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
             textView.setText(spannable, TextView.BufferType.SPANNABLE)
         }
 
+        @SuppressLint("SimpleDateFormat")
+        private fun getCurrentDate(): String {
+            val simpleDateFormat = SimpleDateFormat("EEE, d MMM")
+            simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val today = Calendar.getInstance().time
+            return simpleDateFormat.format(today)
+        }
+
+        // TODO: Add time remaining till next alarm functionality
         private fun nextAlarmTimeLeft(context: Context): String {
 
             val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

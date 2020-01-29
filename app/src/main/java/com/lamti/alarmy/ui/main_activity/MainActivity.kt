@@ -15,6 +15,7 @@ import android.view.ViewAnimationUtils
 import android.os.Handler
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.animation.Animation
 import com.lamti.alarmy.R
 import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.ui.NewAlarmActivity
@@ -25,42 +26,79 @@ import com.lamti.alarmy.domain.utils.*
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
     private val alarmVieModel: AlarmVieModel by viewModel()
-    private val alarmsAdapter : AlarmAdapter by inject { parametersOf(this, this@MainActivity) }
+    private val alarmsAdapter: AlarmAdapter by inject { parametersOf(this, this@MainActivity) }
     private val alarmyManager = AlarmyManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        alarmsAdapter.setInteraction(this)
-
+        addAlarmInteraction()
         initRecyclerView()
         initObserver()
         addAlarmListener()
-
         add_alarm_IV.scaleAnimation()
     }
 
     override fun onResume() {
         super.onResume()
+        showMainLayout()
+    }
+
+    private fun showMainLayout() {
         main_root_CL.visibility = VISIBLE
         main_root_CL.alpha = 1f
     }
 
+    override fun onItemSelected(position: Int, item: Alarm) {
+        redirectTo(NewAlarmActivity::class.java, item)
+    }
+
+    override fun onItemChecked(position: Int, item: Alarm) {
+        changeAlarmStatus(item)
+        updateAlarmState(position, item)
+    }
+
+    private fun changeAlarmStatus(item: Alarm) {
+        item.isOn = !item.isOn
+    }
+
+    private fun updateAlarmState(position: Int, item: Alarm) {
+        alarmVieModel.updateAlarm(item).invokeOnCompletion {
+            alarmsAdapter.notifyItemChanged(position)
+            alarmyManager.updateAlarm(item, applicationContext)
+        }
+    }
+
+    override fun onSettingsClicked() {
+        redirectTo(SettingsActivity::class.java)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    private fun addAlarmInteraction() {
+        alarmsAdapter.setInteraction(this)
+    }
 
     private fun initRecyclerView() {
         alarms_RV.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            addItemDecoration(SpacingItemDecoration( this@MainActivity,60))
+            addItemDecoration(SpacingItemDecoration(this@MainActivity, 60))
             adapter = alarmsAdapter
         }
     }
 
     private fun initObserver() {
         alarmVieModel.allAlarms.observe(this, Observer { result ->
-            if ( result.isEmpty() ) {
-                val headerAlarm = Alarm(0, "nullara", 0L,"nullara",null, null, game = false,
-                    vibration = false, snooze = false, isOn = false)
+            if (result.isEmpty()) {
+                val headerAlarm = Alarm(
+                    0, "nullara", 0L,
+                    "nullara", null, null,
+                    game = false, vibration = false, snooze = false,
+                    isOn = false
+                )
                 alarmVieModel.insert(headerAlarm)
             }
             alarmsAdapter.submitList(result)
@@ -73,39 +111,66 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         }
     }
 
+    // Animations
+    private val REVEAL_ANIMATION_DURATION: Long = 350
     private fun revealButton() {
+        hideAddAlarmButton()
+        showRevealView()
+        val revealAnimation = createRevealAnimation()
+        revealAnimation.apply {
+            setAnimationDuration(this)
+            addRevealAnimationListener(this)
+            start()
+        }
+
+    }
+
+    private fun hideAddAlarmButton() {
         add_alarm_IV.elevation = 0f
         add_alarm_IV.alpha = 0f
+    }
+
+    private fun showRevealView() {
         reveal_view.visibility = VISIBLE
         reveal_view.alpha = 1f
+    }
 
+    private fun createRevealAnimation(): Animator {
         val cx = reveal_view.width
         val cy = reveal_view.height
         val startX = (getFabWidth() / 2 + add_alarm_IV.x).toInt()
         val startY = (getFabWidth() / 2 + add_alarm_IV.y).toInt()
         val finalRadius = cx.coerceAtLeast(cy) * 1.2f
-        val revealAnimation = ViewAnimationUtils.createCircularReveal(reveal_view, startX, startY, getFabWidth(), finalRadius)
+        return ViewAnimationUtils.createCircularReveal(
+            reveal_view,
+            startX,
+            startY,
+            getFabWidth(),
+            finalRadius
+        )
+    }
 
-        revealAnimation.duration = 350
+    private fun getFabWidth(): Float = add_alarm_IV.width.toFloat()
+
+    private fun setAnimationDuration(revealAnimation: Animator) {
+        revealAnimation.duration = REVEAL_ANIMATION_DURATION
+    }
+
+    private fun addRevealAnimationListener(revealAnimation: Animator) {
         revealAnimation.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator?) {
                 super.onAnimationStart(animation)
                 delayedStartNextActivity()
                 main_root_CL.fadeOut()
             }
+
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 add_alarm_IV.alpha = 1f
-
-                reveal_view.visibility = GONE
-                reveal_view.alpha = 0f
+                hideRevealView()
             }
         })
-
-        revealAnimation.start()
     }
-
-    private fun getFabWidth(): Float = add_alarm_IV.width.toFloat()
 
     private fun delayedStartNextActivity() {
         Handler().postDelayed(Runnable {
@@ -113,25 +178,8 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         }, 100)
     }
 
-    override fun onItemSelected(position: Int, item: Alarm) {
-        redirectTo(NewAlarmActivity::class.java, item)
-    }
-
-    override fun onItemChecked(position: Int, item: Alarm) {
-        item.isOn = !item.isOn
-        alarmVieModel.updateAlarm(item).invokeOnCompletion {
-            alarmsAdapter.notifyItemChanged(position)
-            alarmyManager.updateAlarm(item, applicationContext)
-        }
-    }
-
-    override fun onSettingsClicked() {
-//        mainVieModel.deleteAll()
-        redirectTo(SettingsActivity::class.java)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        alarmVieModel
+    private fun hideRevealView() {
+        reveal_view.visibility = GONE
+        reveal_view.alpha = 0f
     }
 }
