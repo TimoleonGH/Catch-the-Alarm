@@ -152,20 +152,28 @@ fun View.randomPositionAnimation(
 private fun View.setRandomXYPosition(root: ConstraintLayout, windowManager: WindowManager) {
     val set = ConstraintSet()
     set.clone(root)
-    set.setTranslationX(this.id, getRandomX(windowManager) - this.x)
-    set.setTranslationY(this.id, getRandomY(windowManager) - this.y)
+    set.setTranslationX(this.id, getRandomX(windowManager))
+    set.setTranslationY(this.id, getRandomY(windowManager))
     set.applyTo(root)
 }
 
 
 private fun getRandomX(windowManager: WindowManager): Float {
-    val x = Random().nextInt(getScreenWidthSize(windowManager)) / 2
-    return x.toFloat()
+    val x = Random().nextInt(getScreenWidthSize(windowManager) / 3)
+    val positiveRandom = Random().nextInt(2)
+    return if (positiveRandom == 1)
+        x.toFloat()
+    else
+        -x.toFloat()
 }
 
 private fun getRandomY(windowManager: WindowManager): Float {
-    val y = Random().nextInt(getScreenHeightSize(windowManager)) / 2
-    return y.toFloat()
+    val y = Random().nextInt(getScreenHeightSize(windowManager) / 3)
+    val positiveRandom = Random().nextInt(2)
+    return if (positiveRandom == 1)
+        y.toFloat()
+    else
+        -y.toFloat()
 }
 
 private fun getScreenWidthSize(windowManager: WindowManager): Int {

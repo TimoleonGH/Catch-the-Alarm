@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -28,6 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 private const val GAME_COUNTER_GOAL = 2
+private const val ALARM_TITLE = "Wake App man! Work as it is still day..."
 
 class AlarmyActivity : AppCompatActivity() {
     private val alarmyManager = AlarmyManager
@@ -38,6 +38,7 @@ class AlarmyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setFullscreen()
         setContentView(R.layout.activity_alarmy)
 
@@ -64,26 +65,33 @@ class AlarmyActivity : AppCompatActivity() {
     }
 
     private fun initAll() {
-        // get alarm
+        getAlarm()
+        setAlarmTitle()
+        setDate()
+        pulseAnimation()
+        startMediaPlayer(applicationContext)
+        setVibration()
+        setGame()
+        setSnooze()
+    }
+
+    private fun getAlarm(): Alarm {
         val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
         val type = object : TypeToken<Alarm>() {}.type
-        alarm = Gson().fromJson(stringLocation, type)
+        return Gson().fromJson(stringLocation, type)
+    }
 
+    private fun setAlarmTitle() {
         if (alarm.message.isEmpty())
-            alarmy_text_TV.text = "Wake App man! Work as it is still day..."
+            alarmy_text_TV.text = ALARM_TITLE
         else
             alarmy_text_TV.text = alarm.message
+    }
 
+    private fun setDate() {
         val dateFormat =
             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
         alarmy_title_TV.text = dateFormat.format(Calendar.getInstance().time)
-
-        pulseAnimation()
-
-        startMediaPlayer(applicationContext)
-        if (alarm.vibration) vibrate(applicationContext)
-        if (alarm.game) game()
-        snooze()
     }
 
     private fun pulseAnimation() {
@@ -99,19 +107,18 @@ class AlarmyActivity : AppCompatActivity() {
         layout_ripple_pulse.startRippleAnimation()
     }
 
+    private fun setVibration() {
+        if (alarm.vibration)
+            vibrate(applicationContext)
+    }
+
+    private fun setGame() {
+        if (alarm.game) game()
+    }
+
     private fun clickListeners() {
         alarmy_stop_alarm_IV.setOnClickListener {
-            if (alarm.game) {
-                if (gameCounter >= GAME_COUNTER_GOAL) {
-                    stopAlarm()
-                } else {
-                    gameCounter++
-                    Toast.makeText(this@AlarmyActivity, "pressed: $gameCounter", Toast.LENGTH_SHORT)
-                        .show()
-                }
-            } else {
-                stopAlarm()
-            }
+            stopGameAlarmOrGamelessAlarm()
         }
 
         alarmy_snooze_TV.setOnClickListener {
@@ -120,31 +127,58 @@ class AlarmyActivity : AppCompatActivity() {
         }
     }
 
-    private fun stopAlarm() {
+    private fun stopGameAlarmOrGamelessAlarm() {
+        if (alarm.game) {
+            stopGameAlarm()
+        } else {
+            stopAlarmActivity()
+        }
+    }
+
+    private fun stopGameAlarm() {
+        if (gameCounter >= GAME_COUNTER_GOAL) {
+            stopAlarmActivity()
+        } else {
+            gameCounter++
+            Toast.makeText(this@AlarmyActivity, "pressed: $gameCounter", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopAlarmActivity() {
         layout_ripple_pulse.stopRippleAnimation()
         stopVibration()
         stopMediaPlayer()
+        stopAlarm()
+        closeApp()
+    }
 
+    private fun stopAlarm() {
         if (alarm.intDays.isNullOrEmpty()) {
-            alarm.isOn = false
-            alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
-                alarmyManager.cancelAlarm(alarm, applicationContext)
-            }
+            cancelAlarm()
             AlarmyNotificationService.stopService(this)
         } else {
             AlarmyNotificationService.stopService(this)
-            // Check if repeating alarm has only one day to fix the above bug
-            if (alarm.intDays?.size == 1) {
-                // start next alarm after one minute (and something) to prevent from ringing again
-                Handler().postDelayed(Runnable {
-                    if (alarm.isOn)
-                        alarmyManager.addAlarm(alarm, this, true)
-                }, 62 * 1000)
-            } else
-                alarmyManager.addAlarm(alarm, this, true)
+            restartRepeatingAlarm()
         }
+    }
 
-        closeApp()
+    private fun cancelAlarm() {
+        alarm.isOn = false
+        alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
+            alarmyManager.cancelAlarm(alarm, applicationContext)
+        }
+    }
+
+    private fun restartRepeatingAlarm() {
+        // Check if repeating alarm has only one day to fix the above bug
+        if (alarm.intDays?.size == 1) {
+            // start next alarm after one minute (and something) to prevent from ringing again
+            Handler().postDelayed(Runnable {
+                if (alarm.isOn)
+                    alarmyManager.addAlarm(alarm, this, true)
+            }, 62 * 1000)
+        } else
+            alarmyManager.addAlarm(alarm, this, true)
     }
 
     private fun closeApp() = finishAndRemoveTask()
@@ -152,7 +186,7 @@ class AlarmyActivity : AppCompatActivity() {
     private fun game() =
         alarmy_stop_alarm_IV.randomPositionAnimation(alarmy_activity_root_CL, windowManager)
 
-    private fun snooze() {
+    private fun setSnooze() {
         if (alarm.snooze)
             alarmy_snooze_TV.visibility = View.VISIBLE
         else
