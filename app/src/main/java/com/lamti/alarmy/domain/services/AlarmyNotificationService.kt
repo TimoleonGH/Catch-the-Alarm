@@ -27,6 +27,16 @@ class AlarmyNotificationService : Service() {
         private const val FOREGROUND_NOTIFICATION_CHANNEL_ID = "wake_app_alarm_id"
 
         fun startService(context: Context, message: String, alarm: String?) {
+            val startIntent = initStartIntent(context, message, alarm)
+            ContextCompat.startForegroundService(context, startIntent)
+        }
+
+        fun stopService(context: Context) {
+            val stopIntent = Intent(context, AlarmyNotificationService::class.java)
+            context.stopService(stopIntent)
+        }
+
+        private fun initStartIntent(context: Context, message: String, alarm: String?): Intent {
             var startIntent = Intent(context, AlarmyNotificationService::class.java)
             startIntent.putExtra(FOREGROUND_INPUT_EXTRA, message)
             startIntent.putExtra(ALARM_DATA_EXTRA, alarm)
@@ -35,32 +45,16 @@ class AlarmyNotificationService : Service() {
                 startIntent = Intent(context, AlarmyActivity::class.java)
             }
 
-            ContextCompat.startForegroundService(context, startIntent)
-        }
-
-        fun stopService(context: Context) {
-            val stopIntent = Intent(context, AlarmyNotificationService::class.java)
-            context.stopService(stopIntent)
+            return startIntent
         }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-
         startForeground(FOREGROUND_NOTIFICATION_ID, createNotification(intent))
-
-        val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
-        val type = object : TypeToken<Alarm>() {}.type
-        val alarm: Alarm = Gson().fromJson(stringLocation, type)
-
-        if (alarm.vibration) vibrate(applicationContext)
+        startVibration(getAlarm(intent))
         startMediaPlayer(applicationContext)
-
         return START_NOT_STICKY
-    }
-
-    override fun onBind(intent: Intent): IBinder? {
-        return null
     }
 
     private fun createNotificationChannel() {
@@ -76,26 +70,65 @@ class AlarmyNotificationService : Service() {
     }
 
     private fun createNotification(intent: Intent?): Notification {
+        val alarmyIntent = createIntent(intent)
+        val stackBuilder = getTaskStackBuilder(alarmyIntent)
+        val pendingIntent = getPendingIntent(stackBuilder)
+        val actionBuilder = getActionBuilder(pendingIntent)
+        return buildNotification(intent, pendingIntent, actionBuilder)
+    }
+
+    private fun createIntent(intent: Intent?): Intent {
         val alarmyIntent = Intent(this, AlarmyActivity::class.java)
         alarmyIntent.putExtra(ALARM_DATA_EXTRA, intent?.getStringExtra(ALARM_DATA_EXTRA))
+        return alarmyIntent
+    }
 
+    private fun getTaskStackBuilder(intent: Intent): TaskStackBuilder {
         val stackBuilder: TaskStackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addParentStack(AlarmyActivity::class.java)
-        stackBuilder.addNextIntent(alarmyIntent)
+        stackBuilder.addNextIntent(intent)
+        return stackBuilder
+    }
 
-        val pendingIntent: PendingIntent = stackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT)
-        val actionBuilder =
-            NotificationCompat.Action.Builder(R.drawable.ic_add_alarm, "Action", pendingIntent)
+    private fun getPendingIntent(stackBuilder: TaskStackBuilder): PendingIntent {
+        return stackBuilder.getPendingIntent(0, FLAG_UPDATE_CURRENT)
+    }
 
-        return NotificationCompat.Builder(
-            this,
-            FOREGROUND_NOTIFICATION_CHANNEL_ID
+    private fun getActionBuilder(pendingIntent: PendingIntent): NotificationCompat.Action.Builder {
+        return NotificationCompat.Action.Builder(
+            R.drawable.ic_add_alarm,
+            "Close Alarm",
+            pendingIntent
         )
+    }
+
+    private fun buildNotification(
+        intent: Intent?,
+        pendingIntent: PendingIntent,
+        actionBuilder: NotificationCompat.Action.Builder
+    ): Notification {
+
+        return NotificationCompat.Builder(this, FOREGROUND_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(FOREGROUND_NOTIFICATION_TITLE)
             .setContentText(intent?.getStringExtra(FOREGROUND_INPUT_EXTRA))
             .setSmallIcon(R.drawable.ic_add_alarm)
             .setContentIntent(pendingIntent)
             .addAction(actionBuilder.build())
             .build()
+    }
+
+    private fun startVibration(alarm: Alarm) {
+        if (alarm.vibration)
+            vibrate(applicationContext)
+    }
+
+    private fun getAlarm(intent: Intent?): Alarm {
+        val stringLocation = intent?.getStringExtra(ALARM_DATA_EXTRA)
+        val type = object : TypeToken<Alarm>() {}.type
+        return Gson().fromJson(stringLocation, type)
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
     }
 }

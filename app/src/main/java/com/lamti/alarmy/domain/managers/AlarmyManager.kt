@@ -2,6 +2,7 @@ package com.lamti.alarmy.domain.managers
 
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.lamti.alarmy.data.models.Alarm
@@ -18,47 +19,70 @@ object AlarmyManager {
 
     private var alarmMgr: AlarmManager? = null
 
-    private fun initAlarmyManager(context: Context) {
-        alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    fun addAlarm(alarm: Alarm, context: Context, nextAlarmFlag: Boolean = false) {
+        initAlarmyManager(context)
+        val broadcastIntent = initBroadcastIntent(context, alarm)
+        val pendingIntent = initPendingIntent(context, alarm, broadcastIntent)
+        createAlarm(alarm, pendingIntent, nextAlarmFlag)
     }
 
-    fun addAlarm(alarm: Alarm, context: Context, nextAlarmFlag: Boolean = false) {
+    private fun initAlarmyManager(context: Context) {
         if (alarmMgr == null)
-            initAlarmyManager(context)
+            alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    }
 
-        // Intent to start the Broadcast Receiver
+    private fun initBroadcastIntent(context: Context, alarm: Alarm): Intent {
         val broadcastIntent = Intent(context, AlarmyReceiver::class.java)
         val type = object : TypeToken<Alarm>() {}.type
         val json = Gson().toJson(alarm, type)
         broadcastIntent.putExtra(ALARM_DATA_EXTRA, json)
-        val pIntent = PendingIntent.getBroadcast(
+
+        return broadcastIntent
+    }
+
+    private fun initPendingIntent(
+        context: Context,
+        alarm: Alarm,
+        broadcastIntent: Intent
+    ): PendingIntent {
+        return PendingIntent.getBroadcast(
             context.applicationContext,
             alarm.id,
             broadcastIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
-
-        // one time alarm
-        if (alarm.intDays.isNullOrEmpty()) {
-            val info = if (System.currentTimeMillis() < alarm.time.getTimeInMillis())
-                AlarmManager.AlarmClockInfo(alarm.time.getTimeInMillis(), pIntent)
-            else
-                AlarmManager.AlarmClockInfo(
-                    alarm.time.getTimeInMillis() + AlarmManager.INTERVAL_DAY,
-                    pIntent
-                )
-
-            alarmMgr?.setAlarmClock(info, pIntent)
-        } else
-            addRepeatingAlarm(
-                alarm,
-                context,
-                pIntent,
-                nextAlarmFlag
-            )
     }
 
-    private fun addRepeatingAlarm(alarm: Alarm, context: Context, pIntent: PendingIntent, nextAlarmFlag: Boolean) {
+    private fun createAlarm(alarm: Alarm, pendingIntent: PendingIntent, nextAlarmFlag: Boolean) {
+        val hasAlarmRepeatingDays = alarm.intDays.isNullOrEmpty()
+        if (hasAlarmRepeatingDays) {
+            addOneTimeAlarm(alarm, pendingIntent)
+        } else
+            addRepeatingAlarm(alarm, pendingIntent, nextAlarmFlag)
+    }
+
+    private fun addOneTimeAlarm(alarm: Alarm, pendingIntent: PendingIntent) {
+        val isAlarmTimeGreaterThanCurrentTime =
+            System.currentTimeMillis() < alarm.time.getTimeInMillis()
+        val info = if (isAlarmTimeGreaterThanCurrentTime)
+            AlarmManager.AlarmClockInfo(alarm.time.getTimeInMillis(), pendingIntent)
+        else
+            addOneTimeAlarmForNextDay(alarm, pendingIntent)
+
+        alarmMgr?.setAlarmClock(info, pendingIntent)
+    }
+
+    private fun addOneTimeAlarmForNextDay(
+        alarm: Alarm,
+        pendingIntent: PendingIntent
+    ): AlarmManager.AlarmClockInfo {
+        return AlarmManager.AlarmClockInfo(
+            alarm.time.getTimeInMillis() + AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
+
+    private fun addRepeatingAlarm(alarm: Alarm, pIntent: PendingIntent, nextAlarmFlag: Boolean) {
         var currentWeekDay = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
         var alarmDay = currentWeekDay
         var alarmDayFound = false
@@ -107,32 +131,25 @@ object AlarmyManager {
     }
 
     fun cancelAlarm(alarm: Alarm, context: Context) {
-        if (alarmMgr == null)
-            initAlarmyManager(context)
+        initAlarmyManager(context)
+        val pendingIntent = initCancelAlarmPendingIntent(context, alarm)
+        alarmMgr?.cancel(pendingIntent)
+    }
 
-        // Intent to start the Broadcast Receiver
+    private fun initCancelAlarmPendingIntent(context: Context, alarm: Alarm): PendingIntent {
         val broadcastIntent = Intent(context, AlarmyReceiver::class.java)
-        val pIntent = PendingIntent.getBroadcast(
+        return PendingIntent.getBroadcast(
             context.applicationContext,
             alarm.id,
             broadcastIntent,
             PendingIntent.FLAG_UPDATE_CURRENT
         )
-        alarmMgr?.cancel(pIntent)
     }
 
     fun cancelAllAlarms(alarms: ArrayList<Alarm>, context: Context) {
-        // Intent to start the Broadcast Receiver
-        val broadcastIntent = Intent(context, AlarmyReceiver::class.java)
-
         alarms.forEach { alarm ->
-            val pIntent = PendingIntent.getBroadcast(
-                context.applicationContext,
-                alarm.id,
-                broadcastIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            alarmMgr?.cancel(pIntent)
+            val pendingIntent = initCancelAlarmPendingIntent(context, alarm)
+            alarmMgr?.cancel(pendingIntent)
         }
     }
 }

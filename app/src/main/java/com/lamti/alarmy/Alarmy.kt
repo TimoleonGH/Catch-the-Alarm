@@ -25,7 +25,7 @@ class Alarmy : Application() {
         val receiver = ComponentName(applicationContext, RebootReceiver::class.java)
         applicationContext.packageManager?.setComponentEnabledSetting(
             receiver,
-            PackageManager.COMPONENT_ENABLED_STATE_ENABLED, // PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
             PackageManager.DONT_KILL_APP
         )
     }

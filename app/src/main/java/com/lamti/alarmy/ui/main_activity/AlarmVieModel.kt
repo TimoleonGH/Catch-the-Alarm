@@ -7,7 +7,7 @@ import com.lamti.alarmy.data.Repository
 import com.lamti.alarmy.data.models.Alarm
 import kotlinx.coroutines.launch
 
-class MainVieModel (private val repository: Repository) : ViewModel() {
+class AlarmVieModel(private val repository: Repository) : ViewModel() {
 
     val allAlarms: LiveData<List<Alarm>> = repository.allAlarms
     var insertedAlarmID = 0L

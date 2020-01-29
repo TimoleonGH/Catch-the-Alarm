@@ -1,11 +1,10 @@
 package com.lamti.alarmy.data
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import com.lamti.alarmy.data.local.AlarmsDao
 import com.lamti.alarmy.data.models.Alarm
 
-class Repository (private val alarmsDao: AlarmsDao, private val context: Context) {
+class Repository(private val alarmsDao: AlarmsDao) {
 
     val allAlarms: LiveData<List<Alarm>> = alarmsDao.alarms()
 

@@ -25,7 +25,6 @@ class SpacingItemDecoration (private val context: Context, private val padding: 
         state: RecyclerView.State
     ) {
         super.getItemOffsets(outRect, view, parent, state)
-//        outRect.top = padding
         outRect.left = padding
         outRect.right = padding
     }

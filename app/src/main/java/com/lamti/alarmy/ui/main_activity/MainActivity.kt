@@ -24,7 +24,7 @@ import com.lamti.alarmy.domain.utils.*
 
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
-    private val mainVieModel: MainVieModel by viewModel()
+    private val alarmVieModel: AlarmVieModel by viewModel()
     private val alarmsAdapter : AlarmAdapter by inject { parametersOf(this, this@MainActivity) }
     private val alarmyManager = AlarmyManager
 
@@ -57,11 +57,11 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
     }
 
     private fun initObserver() {
-        mainVieModel.allAlarms.observe(this, Observer {result ->
+        alarmVieModel.allAlarms.observe(this, Observer { result ->
             if ( result.isEmpty() ) {
                 val headerAlarm = Alarm(0, "nullara", 0L,"nullara",null, null, game = false,
                     vibration = false, snooze = false, isOn = false)
-                mainVieModel.insert(headerAlarm)
+                alarmVieModel.insert(headerAlarm)
             }
             alarmsAdapter.submitList(result)
         })
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
     override fun onItemChecked(position: Int, item: Alarm) {
         item.isOn = !item.isOn
-        mainVieModel.updateAlarm(item).invokeOnCompletion {
+        alarmVieModel.updateAlarm(item).invokeOnCompletion {
             alarmsAdapter.notifyItemChanged(position)
             alarmyManager.updateAlarm(item, applicationContext)
         }
@@ -132,6 +132,6 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
     override fun onDestroy() {
         super.onDestroy()
-        mainVieModel
+        alarmVieModel
     }
 }

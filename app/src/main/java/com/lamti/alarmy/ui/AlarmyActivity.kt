@@ -15,7 +15,7 @@ import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.domain.services.AlarmyNotificationService
 import com.lamti.alarmy.R
 import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.ui.main_activity.MainVieModel
+import com.lamti.alarmy.ui.main_activity.AlarmVieModel
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.managers.MediaPlayerManager.startMediaPlayer
 import com.lamti.alarmy.domain.managers.MediaPlayerManager.stopMediaPlayer
@@ -27,11 +27,13 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
+private const val GAME_COUNTER_GOAL = 3
 
 class AlarmyActivity : AppCompatActivity() {
-    private lateinit var alarm: Alarm
     private val alarmyManager = AlarmyManager
-    private val mainVieModel: MainVieModel by viewModel()
+    private val alarmVieModel: AlarmVieModel by viewModel()
+
+    private lateinit var alarm: Alarm
     private var gameCounter = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +41,6 @@ class AlarmyActivity : AppCompatActivity() {
         setFullscreen()
         setContentView(R.layout.activity_alarmy)
 
-        Log.d("APAPA", "extra: ${intent?.getStringExtra(ALARM_DATA_EXTRA)}")
         initAll()
         clickListeners()
     }
@@ -54,7 +55,6 @@ class AlarmyActivity : AppCompatActivity() {
                     WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
         window.decorView.systemUiVisibility = (
-                //        View.SYSTEM_UI_FLAG_LOW_PROFILE
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -102,7 +102,7 @@ class AlarmyActivity : AppCompatActivity() {
     private fun clickListeners() {
         alarmy_stop_alarm_IV.setOnClickListener {
             if (alarm.game) {
-                if (gameCounter >= 9) {
+                if (gameCounter >= GAME_COUNTER_GOAL) {
                     stopAlarm()
                 } else {
                     gameCounter++
@@ -127,7 +127,7 @@ class AlarmyActivity : AppCompatActivity() {
 
         if (alarm.intDays.isNullOrEmpty()) {
             alarm.isOn = false
-            mainVieModel.updateAlarm(alarm).invokeOnCompletion {
+            alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
                 alarmyManager.cancelAlarm(alarm, applicationContext)
             }
             AlarmyNotificationService.stopService(this)
@@ -147,10 +147,7 @@ class AlarmyActivity : AppCompatActivity() {
         closeApp()
     }
 
-    private fun closeApp() {
-        finishAndRemoveTask()
-    }
-
+    private fun closeApp() = finishAndRemoveTask()
 
     private fun game() =
         alarmy_stop_alarm_IV.randomPositionAnimation(alarmy_activity_root_CL, windowManager)

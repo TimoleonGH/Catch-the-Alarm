@@ -13,7 +13,7 @@ import com.google.gson.Gson
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.domain.receivers.AlarmyReceiver
-import com.lamti.alarmy.ui.main_activity.MainVieModel
+import com.lamti.alarmy.ui.main_activity.AlarmVieModel
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.utils.changeIconColor
 import kotlinx.android.synthetic.main.activity_new_alarm.*
@@ -27,7 +27,7 @@ class NewAlarmActivity : AppCompatActivity() {
     private lateinit var alarm: Alarm
     private var updateAlarm = false
     private val decimalFormat = DecimalFormat("00")
-    private val mainVieModel: MainVieModel by viewModel()
+    private val alarmVieModel: AlarmVieModel by viewModel()
     private val alarmyManager = AlarmyManager
     private val alarmyReceiver: AlarmyReceiver = AlarmyReceiver()
 
@@ -125,7 +125,7 @@ class NewAlarmActivity : AppCompatActivity() {
     private fun clickListeners() {
         new_alarm_delete_IV.setOnClickListener {
             alarmyManager.cancelAlarm(alarm, applicationContext)
-            mainVieModel.deleteAlarm(alarm)
+            alarmVieModel.deleteAlarm(alarm)
             finish()
         }
 
@@ -154,13 +154,13 @@ class NewAlarmActivity : AppCompatActivity() {
 
             if (updateAlarm) {
                 alarm.isOn = true
-                mainVieModel.updateAlarm(alarm).invokeOnCompletion {
+                alarmVieModel.updateAlarm(alarm).invokeOnCompletion {
                     alarmyManager.addAlarm(alarm, applicationContext)
                     finish()
                 }
             } else {
-                mainVieModel.insert(alarm).invokeOnCompletion {
-                    alarm.id = mainVieModel.insertedAlarmID.toInt()
+                alarmVieModel.insert(alarm).invokeOnCompletion {
+                    alarm.id = alarmVieModel.insertedAlarmID.toInt()
                     alarmyManager.addAlarm(alarm, applicationContext)
                     finish()
                 }

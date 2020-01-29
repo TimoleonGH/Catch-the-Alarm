@@ -12,25 +12,39 @@ object MediaPlayerManager {
     private var mediaPlayer: MediaPlayer? = null
 
     fun startMediaPlayer(context: Context) {
+        initMediaPlayer()
+        setPlayerDataSource(context)
+        startMediaPlayerIfIsNotPlaying()
+    }
+
+    private fun initMediaPlayer() {
         mediaPlayer = MediaPlayer()
+        setAudioAttributesForAndroidVersion()
+        preparePlayer()
+    }
+
+    private fun setAudioAttributesForAndroidVersion() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val audioAttributes = AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
                 .setUsage(AudioAttributes.USAGE_ALARM)
                 .build()
-            mediaPlayer!!.setAudioAttributes(audioAttributes)
+            mediaPlayer?.setAudioAttributes(audioAttributes)
         } else {
-            mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_RING)
+            mediaPlayer?.setAudioStreamType(AudioManager.STREAM_RING)
         }
+    }
 
-        mediaPlayer!!.setDataSource(context, getAlarmUri()!!)
+    private fun preparePlayer() {
         try {
-            mediaPlayer!!.prepare()
+            mediaPlayer?.prepare()
         } catch (e: Exception) {
-        }
 
-        if (!mediaPlayer!!.isPlaying)
-            mediaPlayer!!.start()
+        }
+    }
+
+    private fun setPlayerDataSource(context: Context) {
+        mediaPlayer?.setDataSource(context, getAlarmUri()!!)
     }
 
     private fun getAlarmUri(): Uri? {
@@ -43,5 +57,12 @@ object MediaPlayerManager {
         return alert
     }
 
-    fun stopMediaPlayer() = mediaPlayer!!.stop()
+    private fun startMediaPlayerIfIsNotPlaying() {
+        if (mediaPlayer != null && !mediaPlayer!!.isPlaying)
+            startMediaPlayer()
+    }
+
+    private fun startMediaPlayer() = mediaPlayer?.start()
+
+    fun stopMediaPlayer() = mediaPlayer?.stop()
 }

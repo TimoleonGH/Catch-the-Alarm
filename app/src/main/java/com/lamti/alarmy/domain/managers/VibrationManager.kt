@@ -9,13 +9,24 @@ object VibrationManager {
     private var vibrator: Vibrator? = null
 
     fun vibrate(context: Context) {
+        initVibrator(context)
+        val vibratorPattern = setVibratorPattern()
+        setVibratorForAndroidVersion(vibratorPattern)
+    }
+
+    private fun initVibrator(context: Context) {
         vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        val mVibratePattern = longArrayOf(0, 750, 0, 0, 0, 0, 10, 0, 0, 0)
+    }
+
+    private fun setVibratorPattern(): LongArray {
+        return longArrayOf(0, 750, 0, 0, 0, 0, 10, 0, 0, 0)
+    }
+
+    private fun setVibratorForAndroidVersion(vibratorPattern: LongArray) {
         if (Build.VERSION.SDK_INT >= 26) {
-            vibrator?.vibrate(VibrationEffect.createWaveform(mVibratePattern, 0))
-//            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+            vibrator?.vibrate(VibrationEffect.createWaveform(vibratorPattern, 0))
         } else {
-            vibrator?.vibrate(mVibratePattern, 0)
+            vibrator?.vibrate(vibratorPattern, 0)
         }
     }
 
