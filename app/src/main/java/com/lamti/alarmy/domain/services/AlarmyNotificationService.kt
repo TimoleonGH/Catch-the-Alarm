@@ -6,17 +6,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lamti.alarmy.R
 import com.lamti.alarmy.data.models.Alarm
-import com.lamti.alarmy.ui.AlarmyActivity
-import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.managers.MediaPlayerManager.startMediaPlayer
 import com.lamti.alarmy.domain.managers.VibrationManager.vibrate
-
+import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
+import com.lamti.alarmy.ui.AlarmyActivity
 
 class AlarmyNotificationService : Service() {
     companion object {
@@ -50,11 +51,28 @@ class AlarmyNotificationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        unlockScreen()
         createNotificationChannel()
         startForeground(FOREGROUND_NOTIFICATION_ID, createNotification(intent))
         startVibration(getAlarm(intent))
         startMediaPlayer(applicationContext)
         return START_NOT_STICKY
+    }
+
+    private fun unlockScreen() {
+        try {
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val wakelock = pm.newWakeLock(
+                PowerManager.FULL_WAKE_LOCK, "alarmy:wake_app"
+            )
+            wakelock.acquire(60 * 1000)
+        } catch (e: Exception) {
+            Log.d("WAKE_LOG", "exception: $e")
+        }
+
+//        val keyguardManager = getSystemService(Activity.KEYGUARD_SERVICE) as KeyguardManager
+//        val lock = keyguardManager.newKeyguardLock(Context.KEYGUARD_SERVICE)
+//        lock.disableKeyguard()
     }
 
     private fun createNotificationChannel() {

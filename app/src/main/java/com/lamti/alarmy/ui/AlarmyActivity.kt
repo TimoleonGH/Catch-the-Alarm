@@ -39,6 +39,7 @@ class AlarmyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        unlockScreen()
         setFullscreen()
         setContentView(R.layout.activity_alarmy)
 
@@ -46,7 +47,7 @@ class AlarmyActivity : AppCompatActivity() {
         clickListeners()
     }
 
-    private fun setFullscreen() {
+    private fun unlockScreen() {
         window.addFlags(
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
                     WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
@@ -55,6 +56,9 @@ class AlarmyActivity : AppCompatActivity() {
                     WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON or
                     WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
+    }
+
+    private fun setFullscreen() {
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -65,7 +69,7 @@ class AlarmyActivity : AppCompatActivity() {
     }
 
     private fun initAll() {
-        getAlarm()
+        alarm = getAlarm()
         setAlarmTitle()
         setDate()
         pulseAnimation()

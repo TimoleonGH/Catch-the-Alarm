@@ -3,6 +3,8 @@ package com.lamti.alarmy.domain.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.view.WindowManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lamti.alarmy.domain.services.AlarmyNotificationService
@@ -22,7 +24,8 @@ class AlarmyReceiver : BroadcastReceiver() {
     }
 
     private fun returnIfContextOrAlarmIsNull(context: Context?, intent: Intent?) {
-        if (context == null || intent == null || getAlarm(intent) == null) return
+        if (context == null || intent == null || getAlarm(intent) == null)
+            return
     }
 
     private fun getAlarm(intent: Intent?): Alarm? {
