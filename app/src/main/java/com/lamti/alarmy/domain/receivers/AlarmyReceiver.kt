@@ -3,15 +3,11 @@ package com.lamti.alarmy.domain.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.view.WindowManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lamti.alarmy.domain.services.AlarmyNotificationService
 import com.lamti.alarmy.data.models.Alarm
 import com.lamti.alarmy.data.models.HourMinuteModel
-import com.lamti.alarmy.ui.AlarmyActivity
-import com.lamti.alarmy.ui.main_activity.MainActivity
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import java.util.*
 

@@ -2,6 +2,13 @@ package com.lamti.alarmy.ui
 
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.RingtoneManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -14,6 +21,7 @@ import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.domain.services.AlarmyNotificationService
 import com.lamti.alarmy.R
 import com.lamti.alarmy.data.models.Alarm
+import com.lamti.alarmy.domain.managers.MediaPlayerManager
 import com.lamti.alarmy.ui.main_activity.AlarmVieModel
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.managers.MediaPlayerManager.startMediaPlayer
@@ -42,7 +50,6 @@ class AlarmyActivity : AppCompatActivity() {
         unlockScreen()
         setFullscreen()
         setContentView(R.layout.activity_alarmy)
-
         initAll()
         clickListeners()
     }

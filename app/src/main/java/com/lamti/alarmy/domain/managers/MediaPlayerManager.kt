@@ -12,15 +12,20 @@ object MediaPlayerManager {
     private var mediaPlayer: MediaPlayer? = null
 
     fun startMediaPlayer(context: Context) {
-        initMediaPlayer()
-        setPlayerDataSource(context)
+        if (mediaPlayer == null) {
+            initMediaPlayer(context)
+        }
         startMediaPlayerIfIsNotPlaying()
     }
 
-    private fun initMediaPlayer() {
+    private fun initMediaPlayer(context: Context) {
         mediaPlayer = MediaPlayer()
+        setPlayerDataSource(context)
         setAudioAttributesForAndroidVersion()
-        preparePlayer()
+    }
+
+    private fun setPlayerDataSource(context: Context) {
+        mediaPlayer?.setDataSource(context, getAlarmUri()!!)
     }
 
     private fun setAudioAttributesForAndroidVersion() {
@@ -36,15 +41,7 @@ object MediaPlayerManager {
     }
 
     private fun preparePlayer() {
-        try {
-            mediaPlayer?.prepare()
-        } catch (e: Exception) {
-
-        }
-    }
-
-    private fun setPlayerDataSource(context: Context) {
-        mediaPlayer?.setDataSource(context, getAlarmUri()!!)
+        mediaPlayer?.prepare()
     }
 
     private fun getAlarmUri(): Uri? {
@@ -58,8 +55,10 @@ object MediaPlayerManager {
     }
 
     private fun startMediaPlayerIfIsNotPlaying() {
-        if (mediaPlayer != null && !mediaPlayer!!.isPlaying)
+        if (mediaPlayer != null && !mediaPlayer!!.isPlaying) {
+            preparePlayer()
             startMediaPlayer()
+        }
     }
 
     private fun startMediaPlayer() = mediaPlayer?.start()
