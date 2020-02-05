@@ -62,7 +62,8 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
                     .inflate(R.layout.list_item_simple_alarm, parent, false)
                 SimpleAlarmViewHolder(
                     view,
-                    interaction
+                    interaction,
+                    context
                 )
             }
             else -> throw IllegalArgumentException("Invalid view type")
@@ -95,7 +96,12 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
         differ.submitList(list)
     }
 
-    class SimpleAlarmViewHolder(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
+    class SimpleAlarmViewHolder(
+        itemView: View,
+        private val interaction: Interaction?,
+        private val context: Context
+    ) : RecyclerView.ViewHolder(itemView) {
+
         fun bind(item: Alarm) = with(itemView) {
             setClickListeners(item)
 
@@ -128,13 +134,13 @@ class AlarmAdapter(private var interaction: Interaction? = null, private val con
         }
 
         private fun changeViewsColor(item: Alarm) {
-            itemView.simple_item_time_TV.changeTextColor(item.isOn)
-            itemView.simple_item_repeat_TV.changeTextColor(item.isOn)
+            itemView.simple_item_time_TV.changeTextColor(item.isOn, context)
+            itemView.simple_item_repeat_TV.changeTextColor(item.isOn, context)
 
-            itemView.simple_item_message_IV.changeIconColor(item.message.isNotEmpty())
-            itemView.simple_item_snooze_IV.changeIconColor(item.snooze)
-            itemView.simple_item_vibrate_IV.changeIconColor(item.vibration)
-            itemView.simple_item_game_IV.changeIconColor(item.game)
+            itemView.simple_item_message_IV.changeIconColor(item.message.isNotEmpty(), context)
+            itemView.simple_item_snooze_IV.changeIconColor(item.snooze, context)
+            itemView.simple_item_vibrate_IV.changeIconColor(item.vibration, context)
+            itemView.simple_item_game_IV.changeIconColor(item.game, context)
         }
 
         private fun getDaysString(item: Alarm): String {

@@ -19,11 +19,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.google.android.material.snackbar.Snackbar
 import com.lamti.alarmy.data.models.Alarm
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
+import com.lamti.alarmy.R
+import kotlinx.android.synthetic.main.list_item_simple_alarm.view.*
 import java.util.*
 
 const val ALARM_DATA_EXTRA = "ALARM_DATA_EXTRA"
@@ -65,20 +68,20 @@ fun View.scaleAnimation( startScale: Float = 0f, endScale: Float = 1f) {
     view.startAnimation(anim)
 }
 
-fun ImageView.changeIconColor( flag: Boolean ) {
+fun ImageView.changeIconColor(flag: Boolean, context: Context) {
     if ( flag )
-        this.setColorFilter(Color.parseColor("#0E7BF0"), android.graphics.PorterDuff.Mode.SRC_IN)
+        this.setColorFilter(ContextCompat.getColor(context, R.color.colorGray), android.graphics.PorterDuff.Mode.SRC_IN)
     else
-        this.setColorFilter(Color.parseColor("#A8ADB1"), android.graphics.PorterDuff.Mode.SRC_IN)
+        this.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN)
 }
 
-fun TextView.changeTextColor(on: Boolean) {
+fun TextView.changeTextColor(on: Boolean, context: Context) {
     if ( on ) {
-        this.setTextColor(Color.parseColor("#2C3642"))
-        this.setTextColor(Color.parseColor("#2C3642"))
+        this.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
+        this.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
     } else {
-        this.setTextColor(Color.parseColor("#A8ADB1"))
-        this.setTextColor(Color.parseColor("#A8ADB1"))
+        this.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
+        this.setTextColor(ContextCompat.getColor(context, R.color.colorGray))
     }
 }
 

@@ -3,7 +3,9 @@ package com.lamti.alarmy.ui
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
+import androidx.appcompat.app.AppCompatDelegate
 import com.lamti.alarmy.R
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
@@ -12,6 +14,7 @@ import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.ui.main_activity.AlarmVieModel
 import com.lamti.alarmy.domain.utils.ALARM_DATA_EXTRA
 import com.lamti.alarmy.domain.utils.changeIconColor
+import com.lamti.alarmy.night_mode.Settings
 import kotlinx.android.synthetic.main.activity_new_alarm.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.DecimalFormat
@@ -122,9 +125,9 @@ class NewAlarmActivity : AppCompatActivity() {
     }
 
     private fun setIconsColor() {
-        new_alarm_snooze_IV.changeIconColor(alarm.snooze)
-        new_alarm_vibrate_IV.changeIconColor(alarm.vibration)
-        new_alarm_game_IV.changeIconColor(alarm.game)
+        new_alarm_snooze_IV.changeIconColor(alarm.snooze, applicationContext)
+        new_alarm_vibrate_IV.changeIconColor(alarm.vibration, applicationContext)
+        new_alarm_game_IV.changeIconColor(alarm.game, applicationContext)
     }
 
     private fun setAddAlarmButtonText() {
@@ -152,17 +155,17 @@ class NewAlarmActivity : AppCompatActivity() {
 
         new_alarm_snooze_IV.setOnClickListener {
             alarm.snooze = !alarm.snooze
-            new_alarm_snooze_IV.changeIconColor(alarm.snooze)
+            new_alarm_snooze_IV.changeIconColor(alarm.snooze, applicationContext)
         }
 
         new_alarm_vibrate_IV.setOnClickListener {
             alarm.vibration = !alarm.vibration
-            new_alarm_vibrate_IV.changeIconColor(alarm.vibration)
+            new_alarm_vibrate_IV.changeIconColor(alarm.vibration, applicationContext)
         }
 
         new_alarm_game_IV.setOnClickListener {
             alarm.game = !alarm.game
-            new_alarm_game_IV.changeIconColor(alarm.game)
+            new_alarm_game_IV.changeIconColor(alarm.game, applicationContext)
         }
 
         new_alarm_cancel_B.setOnClickListener {
