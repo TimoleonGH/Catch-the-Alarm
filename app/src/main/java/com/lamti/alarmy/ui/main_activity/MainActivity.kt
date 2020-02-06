@@ -13,13 +13,16 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.view.ViewAnimationUtils
 import android.os.Handler
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import com.lamti.alarmy.R
 import com.lamti.alarmy.domain.managers.AlarmyManager
 import com.lamti.alarmy.ui.NewAlarmActivity
 import com.lamti.alarmy.ui.SettingsActivity
 import com.lamti.alarmy.domain.utils.*
+import android.os.Build
+import android.os.Build.VERSION_CODES.M
+import android.view.View
+import android.view.View.*
+import com.lamti.alarmy.R
+
 
 class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
@@ -180,4 +183,5 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
         reveal_view.visibility = GONE
         reveal_view.alpha = 0f
     }
+
 }

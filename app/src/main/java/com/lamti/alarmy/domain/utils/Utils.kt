@@ -70,9 +70,9 @@ fun View.scaleAnimation( startScale: Float = 0f, endScale: Float = 1f) {
 
 fun ImageView.changeIconColor(flag: Boolean, context: Context) {
     if ( flag )
-        this.setColorFilter(ContextCompat.getColor(context, R.color.colorGray), android.graphics.PorterDuff.Mode.SRC_IN)
-    else
         this.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN)
+    else
+        this.setColorFilter(ContextCompat.getColor(context, R.color.colorGray), android.graphics.PorterDuff.Mode.SRC_IN)
 }
 
 fun TextView.changeTextColor(on: Boolean, context: Context) {

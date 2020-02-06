@@ -15,6 +15,7 @@
         android:clipToPadding="false"
         android:paddingTop="0dp"
         android:paddingBottom="120dp"
+        android:overScrollMode="never"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
