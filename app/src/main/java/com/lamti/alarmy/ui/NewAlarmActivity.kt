@@ -49,19 +49,16 @@ class NewAlarmActivity : AppCompatActivity() {
             getAlarmFromString(stringAlarm)
         } else {
             updateAlarm = false
-            Alarm(
-                0,
-                "09:00",
-                0L,
-                "",
-                null,
-                null,
-                game = true,
-                snooze = true,
-                vibration = true,
-                isOn = true
-            )
+            createDefaultAlarm()
         }
+    }
+
+    private fun createDefaultAlarm(): Alarm {
+        return Alarm(
+            0, "09:00", 0L,
+            "", null, null,
+            game = true, snooze = true, vibration = true, isOn = true
+        )
     }
 
     private fun getAlarmFromString(stringAlarm: String): Alarm {

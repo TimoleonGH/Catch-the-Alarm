@@ -93,17 +93,24 @@ class MainActivity : AppCompatActivity(), AlarmAdapter.Interaction {
 
     private fun initObserver() {
         alarmVieModel.allAlarms.observe(this, Observer { result ->
-            if (result.isEmpty()) {
-                val headerAlarm = Alarm(
-                    0, "nullara", 0L,
-                    "nullara", null, null,
-                    game = false, vibration = false, snooze = false,
-                    isOn = false
-                )
-                alarmVieModel.insert(headerAlarm)
-            }
+            addHeaderIfAlarmListIsEmpty(result)
             alarmsAdapter.submitList(result)
         })
+    }
+
+    private fun addHeaderIfAlarmListIsEmpty(result: List<Alarm>) {
+        if (result.isEmpty()) {
+            val header = createFirstAlarm()
+            alarmVieModel.insert(header)
+        }
+    }
+
+    private fun createFirstAlarm(): Alarm {
+        return Alarm(
+            0, "nullara", 0L, "nullara",
+            null, null, game = false, vibration = false,
+            snooze = false, isOn = false
+        )
     }
 
     private fun addAlarmListener() {
